@@ -1,7 +1,5 @@
 'use strict';
 
-// DAO (Data Access Object) dei topic
-
 const sqlite = require('sqlite3');
 const db = new sqlite.Database('./database.db', (err) => {
     if (err) throw err;

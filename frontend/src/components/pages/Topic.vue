@@ -32,7 +32,7 @@
                             </div>
                             <div class="form-check mb-3">
                                 <label class="form-label" for="moreinfo">Richiede informazioni aggiuntive</label>
-                                <input type="checkbox" class="form-check-input" name="moreinfo" id="moreinfo"> />
+                                <input type="checkbox" class="form-check-input" name="moreinfo" id="moreinfo" />
                             </div>
                          
                             <!-- if editing topic, display the update button instead of create button -->
@@ -123,6 +123,7 @@
 
 <script>
 import axios from 'axios';
+import '../../assets/js/topics.js'
 
 export default {
     data() {

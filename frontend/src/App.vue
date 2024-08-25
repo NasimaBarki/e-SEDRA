@@ -1,10 +1,15 @@
 <script setup>
-// import della pagina ambiti (topic)
-import Topic from './components/Topic.vue'
+import axios from 'axios';
+
+import TheMenu from "./components/Menu.vue"
+import Topic from './components/pages/Topic.vue'
+import TheFooter from './components/Footer.vue'
 </script>
 
 <template>
-  <main>
+    <TheMenu/>
+  <div id="contentPage" class="flex-shrink-0">
     <Topic />
-  </main>
+  </div>
+  <TheFooter />
 </template>

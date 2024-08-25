@@ -1,0 +1,205 @@
+﻿
+/** This file is part of e-Sedra.
+ *
+ *   e-Sedra is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ *
+ *   e-Sedra is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *   along with e-Sedra.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @copyright Copyright 2023 e-Sedra. All Rights Reserved.
+ *
+ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    /* font-family: Verdana, 'Segoe UI', Tahoma, Geneva, sans-serif;*/
+}
+
+html, body {
+    height: 100%;
+    /*font-size: small;*/
+}
+
+.form-control{
+    background-color:white;
+}
+
+.footercopy {
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+
+/*:root {
+    --primary-color: #881600;*/ /*rosso*/
+   /* --bs-primary: var(--primary-color);*/
+    /*--header-height: 0vh;
+    --eviden-color: #F0A202;*/ /*GIALLO*/
+
+    /*--secondary-color: #748376;*/ /*GRIGIO*/
+    /*--shadow-color: var(--secondary-color);
+    --dark-text: #33202A;*/ /*PORPORA*/
+    /*--background-body: #EBEBEB;*/ /*BIANCO*/
+    /*--contrast-color: var(--bs-danger);*/
+/*}
+*/
+
+.myheader {
+    height: 18vh;
+    background-color: var(--bs-primary) !important;
+        background-image: linear-gradient(to bottom, rgba(255,255,255,0.3), rgba(255,255,255,0.1));
+    box-shadow: 0 2px 4px var(--bs-dark);
+    color: var(--bs-dark);
+    z-index:20;
+    /*padding: 3.5vh;*/
+    /*  display: flex;*/
+    /* justify-content: space-between;*/
+    /*   align-items: center;*/
+}
+
+hr {
+    background-color: var(--bs-secondary);
+}
+
+.myheader h1 {
+    font-size: 350%;
+    color: var(--bs-primary);
+    /*  text-shadow: 1px 1px 2px var(--shadow-color);*/
+    /*        margin-left:1em;*/
+}
+
+
+.progress {
+    width: 98%;
+    margin: 0 auto;
+    background-color: var(--bs-body-bg);
+    visibility: hidden;
+}
+
+#myBar{
+    width:0%;
+}
+
+#msgProgress {
+    width: 98%;
+    margin: 0 auto;
+    font: 80% Verdana,Consolas,Arial,sans-serif;
+    visibility: hidden;
+    /* display: none;*/
+}
+
+
+#appLogo {
+    float: left;
+    padding-left: 1.5em;
+    height: 5.5em;
+}
+
+#appText {
+    float: left;
+    padding-left: 1.5em;
+    height: 7em;
+    width: fit-content;
+}
+/*#installa {
+    display: block;*/
+/* margin: 0.5em auto 0.5em;*/
+/*}*/
+
+#login {
+    display: none;
+    /*    margin: 0.5em auto 0.5em;*/
+}
+
+h2 {
+    color: var(--bs-warning);
+    text-shadow: -1px 0 var(--bs-dark), 0 1px var(--bs-dark), 1px 0 var(--bs-dark), 0 -1px var(--bs-dark);
+}
+
+legend {
+    background-color: var(--bs-warning);
+    color: var(--bs-primary); /*var(--dark-text);*/
+    /*    text-shadow: -1px 0 var(--dark-text), 0 1px var(--dark-text), 1px 0 var(--dark-text), 0 -1px var(--dark-text);*/
+   
+    padding-left: calc(var(--bs-gutter-x) * .2)!important;
+    border-radius: 0.3em;
+    font-weight: bold;
+    box-shadow:1px 1px 4px var(--bs-secondary);
+}
+
+/*select.disabled {
+    background-color: var(--shadow-color);
+    background-image: linear-gradient(rgba(255,255,255,0.8), rgba(255,255,255,0.8));
+}*/
+
+/*select:invalid {
+    color: var(--eviden-color);
+}
+*/
+/*option {
+    color: black;
+}*/
+
+span {
+    color: var(--contrast-color);
+}
+
+div.msg {
+    /* position: absolute;*/
+    /* text-align: right;*/
+    right: 2.5em;
+    line-height: 3.3em;
+    font-weight: 400;
+    color: var(--contrast-color);
+}
+
+fieldset {
+    /*border-color: var(--tertiary-color);
+    border-radius: 13px;
+    display: grid;
+    grid-template-columns: 25% 60% auto;
+    gap: 0.7em;
+    background-color: white;
+    margin: .5em 1em .7em;
+    padding: .8em 1.5em 1.5em;
+    
+    color: var(--dark-text);
+    */
+}
+
+/*label {
+    grid-column-start: 1;
+    text-align: right;
+}*/
+/*input[type="checkbox"] {
+    grid-column-start: 1;
+    justify-self:end;
+}*/
+/*input {
+    grid-column-start: 2;
+}
+
+    input#dbEx {
+        grid-column-start: 2;
+        justify-self: start;
+    }*/
+
+/*.opt label {
+    grid-column: 2/4;
+    text-align: left;
+}
+*/
+/*span {
+    grid-column-start: 3;
+}
+*/

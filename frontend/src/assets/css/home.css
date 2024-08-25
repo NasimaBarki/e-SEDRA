@@ -1,0 +1,119 @@
+﻿
+/** This file is part of e-Sedra.
+ *
+ *   e-Sedra is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ *
+ *   e-Sedra is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *   along with e-Sedra.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @copyright Copyright 2023 e-Sedra. All Rights Reserved.
+ *
+ */
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    color: var(--bs-warning);
+}
+h3 {
+    text-align: left;
+    padding:1em 0;
+}
+
+.img-responsive {
+    width: auto;
+    max-height: 180px;
+}
+
+#loghi, #accantologhi {
+    background-color: white;
+}
+
+#accantologhi {
+    border-top: 1px solid var(--shadow-color);
+    border-left: 1px solid var(--shadow-color);
+    border-right: 1px solid var(--shadow-color);
+    border-bottom: none;
+}
+
+#loghi {
+    border-right: 1px solid var(--shadow-color);
+    border-bottom: 1px solid var(--shadow-color);
+    border-left: 1px solid var(--shadow-color);
+    border-top: none;
+}
+/*
+ * -- TABLET (AND UP) MEDIA QUERIES --
+ * On tablets and other medium-sized devices, we want to customize some
+ * of the mobile styles.
+ */
+@media (min-width: 48em) {
+
+    /* We increase the body font size */
+    body {
+        font-size: 1em;
+    }
+
+    /* We decrease the width of the .splash, since we have more width
+    to work with */
+    .splash {
+        width: 50%;
+        height: 50%;
+    }
+
+    .splash-head {
+        font-size: 250%;
+    }
+
+    #accantologhi {
+        border-top: 1px solid var(--shadow-color);
+        border-left: 1px solid var(--shadow-color);
+        border-bottom: 1px solid var(--shadow-color);
+        border-right: none;
+    }
+
+    #loghi {
+        border-right: 1px solid var(--shadow-color);
+        border-bottom: 1px solid var(--shadow-color);
+        border-top: 1px solid var(--shadow-color);
+        border-left: none;
+    }
+}
+/*
+ * -- DESKTOP (AND UP) MEDIA QUERIES --
+ * On desktops and other large devices, we want to over-ride some
+ * of the mobile and tablet styles.
+ */
+@media (min-width: 78em) {
+    /* We increase the header font size even more */
+    .splash-head {
+        font-size: 300%;
+    }
+
+    #accantologhi {
+        border-top: 1px solid var(--shadow-color);
+        border-left: 1px solid var(--shadow-color);
+        border-bottom: 1px solid var(--shadow-color);
+        border-right: none;
+    }
+
+    #loghi {
+        border-right: 1px solid var(--shadow-color);
+        border-bottom: 1px solid var(--shadow-color);
+        border-top: 1px solid var(--shadow-color);
+        border-left: none;
+    }
+}
+
+

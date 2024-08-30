@@ -1,5 +1,4 @@
-﻿
-/** This file is part of e-Sedra.
+﻿/** This file is part of e-Sedra.
  *
  *   e-Sedra is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -26,32 +25,33 @@
     height: 75vh;
     background-image: linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1)), url("../images/banner5.jpeg");
     /* background: url("../images/banner7.jpeg") top center;*/
-    /**/ /*background-image: url('../images/banner5.jpeg') top center;*/
+    /**/
+    /*background-image: url('../images/banner5.jpeg') top center;*/
     /* Set a specific height */
-  /*  height: 50%;*/
+    /*  height: 50%;*/
     /* Position and center the image to scale nicely on all screens */
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
     position: relative;
 
-   /* background-size: contain;
+    /* background-size: contain;
     position: relative;*/
 }
 
- .banner:before {
-        content: "";
-       /* background: rgba(0, 0, 0, 0.4);*/
-        position: absolute;
-        bottom: 0;
-        top: 0;
-        left: 0;
-        right: 0;
-    }
+.banner:before {
+    content: "";
+    /* background: rgba(0, 0, 0, 0.4);*/
+    position: absolute;
+    bottom: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+}
 
-    .banner .container {
-        padding-top: 72px;
-    }
+.banner .container {
+    padding-top: 72px;
+}
 
 @media (max-width: 992px) {
     .banner .container {
@@ -68,13 +68,15 @@
 }
 
 .banner .welcome_msg {
-        /* width: 45%;*/
-        float: left;
-        padding: 20px;
-    }
-cite{
-    color:var(--bs-warning);
+    /* width: 45%;*/
+    float: left;
+    padding: 20px;
 }
+
+cite {
+    color: var(--bs-warning);
+}
+
 @media (min-width: 1024px) {
     .banner {
         background-attachment: fixed;
@@ -86,8 +88,8 @@ cite{
         height: 80vh;
     }
 
-        .banner h2 {
-            font-size: 18px;
-            line-height: 24px;
-        }
+    .banner h2 {
+        font-size: 18px;
+        line-height: 24px;
+    }
 }

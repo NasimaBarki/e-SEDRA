@@ -9,5 +9,6 @@ import './assets/css/setup.css'
 //Mount dell'App.vue all'interno della div con id app
 import { createApp } from 'vue'
 import App from './App.vue'
+import router from './router'
 
-createApp(App).mount('#app')
+createApp(App).use(router).mount('#app')

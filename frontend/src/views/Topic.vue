@@ -123,7 +123,7 @@
 
 <script>
 import axios from 'axios';
-import '../../assets/js/topics.js'
+import '../assets/js/topics.js'
 
 export default {
     data() {

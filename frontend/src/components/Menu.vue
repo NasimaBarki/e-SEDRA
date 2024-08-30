@@ -3,11 +3,11 @@
     <div class="container d-flex align-items-center">
 
         <a class="logo me-auto">
-            <img id="appText" src="./icons/esedratext1.png" title="logoEsedra" />
+            <img id="appText" src="../assets/images/esedratext1.png" title="logoEsedra" />
             <!--<a href="index.html">e-SEDRA</a>-->
         </a>
         <a class="logo me-auto">
-            <img src="./icons/logo.png" alt="" class="img-fluid" />
+            <img src="../assets/images/logo.png" alt="" class="img-fluid" />
         </a>
 
         <nav id="navbar" class="navbar order-last order-lg-0">
@@ -20,7 +20,8 @@
                           $mact=$_SESSION['user']['menuAct'];
                           // myfunctiontest();?> -->
                 <li>
-                    <a class="<?php if($mact == 0) echo 'active'; ?> text-decoration-none" href="pages/home.php" id="0">Home</a>
+                    <router-link to='/' text-decoration-none>Home</router-link>
+                    <!-- <a class="<?php if($mact == 0) echo 'active'; ?> text-decoration-none" href="pages/home.php" id="0">Home</a> -->
                 </li>
                 <li>
                     <a class="<?php if($mact == 1) echo 'active'; ?> text-decoration-none" href="pages/bisognibase.php" id="1">Bisogni</a>
@@ -43,7 +44,8 @@
                             <a class="<?php if($mact == 4) echo 'active'; ?> text-decoration-none" href="adminsez/admin/admconfact.php" id="4">Attivit&agrave;</a>
                         </li>
                         <li>
-                            <a class="<?php if($mact == 5) echo 'active'; ?> text-decoration-none" href="adminsez/admin/topics.php" id="5">Ambiti</a>
+                            <router-link to='/topic' text-decoration-none>Ambiti</router-link>
+                            <!-- <a class="<?php if($mact == 5) echo 'active'; ?> text-decoration-none" href="adminsez/admin/topics.php" id="5">Ambiti</a> -->
                         </li>
                         <li>
                             <a class="<?php if($mact == 6) echo 'active'; ?> text-decoration-none" href="adminsez/admin/users.php" id="6">Utenti</a>

@@ -23,7 +23,7 @@
 .banner {
     width: 100%;
     height: 75vh;
-    background-image: linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1)), url("../images/banner5.jpeg");
+    background-image: linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1)), url("../banner5.jpeg");
     /* background: url("../images/banner7.jpeg") top center;*/
     /**/
     /*background-image: url('../images/banner5.jpeg') top center;*/

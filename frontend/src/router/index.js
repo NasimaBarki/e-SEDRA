@@ -1,6 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Topic from '../views/Topic.vue'
+
 import Home from '../views/Home.vue'
+import Setup from '../views/Setup.vue'
+import Ambiti from '../views/Ambiti.vue'
 
 const routes = [
     {
@@ -9,9 +11,14 @@ const routes = [
         component: Home
     },
     {
-        path: '/topic',
-        name: 'Topic',
-        component: Topic
+        path: '/setup',
+        name: 'Setup',
+        component: Setup
+    },
+    {
+        path: '/ambiti',
+        name: 'Ambiti',
+        component: Ambiti
     }
 ]
 

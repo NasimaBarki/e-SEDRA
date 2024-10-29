@@ -1,4 +1,4 @@
-﻿
+﻿var apiBaseUrl = 'http://localhost:3000'
 /** This file is part of e-Sedra.
  *
  *   e-Sedra is free software: you can redistribute it and/or modify
@@ -460,7 +460,7 @@ function logerror(num, file, error) {
     formData.append('err', error);
 
     // Utilizziamo fetch per inviare la richiesta
-    fetch('ajax/logerror.php', {
+    fetch(apiBaseUrl + '/logerror', {
         method: 'POST',
         body: formData, // Usiamo formData per inviare i dati come 'application/x-www-form-urlencoded'
         headers: {

@@ -1,5 +1,5 @@
 <template>
-    <footer class="footer mt-auto text-center text-white bg-primary">          
+<footer class="footer mt-auto text-center text-white bg-primary">          
     <!-- Grid container  p-2 pb-0-->
     <div class="container pt-2"> 
         <!-- Section: Social media -->      
@@ -15,12 +15,12 @@
             </a>-->
 
             <!-- mail to -->
-            <a class="btn btn-outline-light btn-floating m-1" role="button"  href='<?php echo "mailto:". $_SESSION[ini][posta]; ?>'>
+            <a class="btn btn-outline-light btn-floating m-1" role="button" disabled >
                 <i class="fa fa-envelope"></i>
             </a>
 
             <!-- Instagram -->                                      <!-- attenzione a cosa mettere di prefisso-->
-            <a class="btn btn-outline-light btn-floating m-1" href='<?php echo $_SESSION[ini][social]; ?>' role="button">
+            <a class="btn btn-outline-light btn-floating m-1"  role="button" disabled>
                 <i class="fab fa-instagram"></i>
             </a>
 
@@ -33,7 +33,7 @@
           
 
             <!-- Instagram -->
-            <a class="btn btn-outline-light btn-floating m-1" href='<?php echo "https://". $_SESSION[ini][web]; ?>' role="button">
+            <a class="btn btn-outline-light btn-floating m-1" href='<?php echo "https://"; ?>' role="button">
                 <i class="fas fa-globe"></i>
             </a>
             <a class="btn btn-outline-light btn-floating m-1" href="http://itacavercelli.it/omnicrazia" role="button">

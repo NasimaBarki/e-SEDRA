@@ -1,9 +1,8 @@
-<script>
-import '../assets/css/banner.css'
-</script>
+<style>
+@import url('../assets/css/banner.css');
+</style>
 
 <template>
-
 <div class="banner d-flex justify-content-center align-items-center">
     <div class="container welcome_msg col-md-6">     
 <figure class="text-end">

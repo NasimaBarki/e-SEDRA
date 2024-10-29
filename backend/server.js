@@ -1,91 +1,50 @@
-'use strict';
+'use strict'
 
 // import
-const express = require('express');
-const session = require('express-session'); // sessioni
-const morgan = require('morgan'); // logging middleware
-const passport = require('passport'); // auth middleware
-const LocalStrategy = require('passport-local').Strategy; // email e psw per il login
-const topicDao = require('./dao/topicDao.js');
+const express = require('express')
+const session = require('express-session')
 
-// set up the "username and password" login strategy
-// by setting a function to verify username and password
-passport.use(new LocalStrategy(
-    function (username, password, done) {
-        userDao.getUser(username, password).then(({ user, check }) => {
-            if (!user) {
-                return done(null, false, { message: 'Incorrect username.' });
-            }
-            if (!check) {
-                return done(null, false, { message: 'Incorrect password.' });
-            }
-            return done(null, user);
-        })
-    }
-));
+const cors = require('cors')
+const morgan = require('morgan')
 
-// serialize and de-serialize the user (user object <-> session)
-passport.serializeUser(function (user, done) {
-    done(null, user.id);
-});
+const config = require('./config.json')
 
-passport.deserializeUser(function (id, done) {
-    userDao.getUserById(id).then(user => {
-        done(null, user);
-    });
-});
+// router
+var setupRouter = require('./routes/setup')
+var logerrorRouter = require('./routes/logerror')
 
-// crea app
-const app = express();
+// router setup
+var ambitiRouter = require('./routes/setup/ambiti')
+var spGetAmbitiRouter = require('./routes/setup/spGetAmbiti')
+var spSearchAmbitiRouter = require('./routes/setup/spSearchAmbiti')
+var spUpdateAmbitiRouter = require('./routes/setup/spUpdateAmbiti')
 
-// set up logging
-app.use(morgan('tiny'));
+// crea app express
+const app = express()
 
-// CORS
-var cors = require('cors');
-app.use(cors());
+app.use(morgan('tiny'))
+app.use(cors())
 
-// ogni richiesta sarà fatta in JSON
-app.use(express.json());
+app.use(express.json())
 
-// porta
-const port = 3000;
-
-// set up sessione
 app.use(session({
-    //store: new FileStore(), // by default, Passport uses a MemoryStore to keep track of the sessions - if you want to use this, launch nodemon with the option: --ignore sessions/
-    secret: 'a secret sentence not to share with anybody and anywhere, used to sign the session ID cookie',
+    secret: config.sessionSecret, // Usa il segreto caricato dal file .env
     resave: false,
-    saveUninitialized: false
-}));
+    saveUninitialized: true,
+    cookie: { secure: false } // Cambia in true se usi HTTPS
+}))
 
 // REST API
+app.use('/', setupRouter)
+app.use('/', logerrorRouter)
 
-// POST /sessions
-app.post('/sessions', (req, res) => {
-    passport.authenticate('local', function (err, user, info) {
-        if (err) { return next(err) }
-        if (!user) {
-            // display wrong login messages
-            return res.status(401).json(info);
-        }
-        // success, perform the login
-        req.login(user, function (err) {
-            if (err) { return next(err); }
-            // req.user contains the authenticated user
-            return res.json(req.user.email);
-        });
-    })(req, res, next);
-})
-
-// GET /topics
-app.get('/topics', (req, res) => {
-    topicDao.getAllTopics()
-        .then((topics) => res.json(topics))
-        .catch(() => res.status(500).end());
-})
+// Setup
+app.use('/', ambitiRouter)
+app.use('/', spGetAmbitiRouter)
+app.use('/', spSearchAmbitiRouter)
+app.use('/', spUpdateAmbitiRouter)
 
 // attivazione server
-app.listen(port, () => {
-    console.log(`Server in ascolto alla porta ${port}`)
+app.listen(config.port, () => {
+    console.log(`Server in esecuzione sulla porta ${config.port}`)
 })

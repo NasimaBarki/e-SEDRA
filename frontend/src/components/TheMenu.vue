@@ -1,22 +1,25 @@
+<style>
+@import url('../assets/css/menu.css');
+</style>
+
+<script setup>
+import Login from './Login.vue'
+</script>
+
 <template>
-    <header id="header" class="fixed-top  bg-primary">
+<header id="header" class="fixed-top  bg-primary">
     <div class="container d-flex align-items-center">
 
         <a class="logo me-auto">
-            <img id="appText" src="../assets/images/esedratext1.png" title="logoEsedra" />
-            <!--<a href="index.html">e-SEDRA</a>-->
+            <img id="appText" src="../assets/esedratext1.png" title="logoEsedra" />
         </a>
         <a class="logo me-auto">
             <img src="../assets/images/logo.png" alt="" class="img-fluid" />
         </a>
 
         <nav id="navbar" class="navbar order-last order-lg-0">
-            <!--<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMenu" aria-controls="navbarMenu" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>-->
-            <!--<div class="mainMenu" id="navbarMenu">-->
             <ul>
-                <!-- <?php if(isset($_SESSION['user'])) { 
+                <!-- TODO: <?php if(isset($_SESSION['user'])) {
                           $mact=$_SESSION['user']['menuAct'];
                           // myfunctiontest();?> -->
                 <li>
@@ -29,7 +32,7 @@
                 <li>
                     <a class="<?php if($mact == 2) echo 'active'; ?> text-decoration-none" href="pages/propostebase.php" id="2">Proposte</a>
                 </li>
-                <!-- <?php 
+                <!-- TODO: <?php
                 if(array_key_exists(1, $_SESSION['user']['roles'])) { //utente è amministratore
                 ?> -->
                 <li class="dropdown">
@@ -44,7 +47,7 @@
                             <a class="<?php if($mact == 4) echo 'active'; ?> text-decoration-none" href="adminsez/admin/admconfact.php" id="4">Attivit&agrave;</a>
                         </li>
                         <li>
-                            <router-link to='/topic' text-decoration-none>Ambiti</router-link>
+                            <router-link to='/ambiti' text-decoration-none>Ambiti</router-link>
                             <!-- <a class="<?php if($mact == 5) echo 'active'; ?> text-decoration-none" href="adminsez/admin/topics.php" id="5">Ambiti</a> -->
                         </li>
                         <li>
@@ -55,22 +58,20 @@
                         </li>
                     </ul>
                 </li>
-                <!-- <?php } 
-                      }?>
+                <!-- TODO: <?php }
+                      }?> -->
 
-                <?php if(isset($_SESSION['user'])) {?> -->
+                <!-- TODO: <?php if(isset($_SESSION['user'])) {?> -->
 
                 <li class="dropdown">
                     <a href="javascript:void(0);" class="no_link text-decoration-none">
                         <i class="bi bi-person-fill"></i>
                         <span>
-                            <!-- &nbsp;<?php echo $_SESSION['user']['nome'].' '.$_SESSION['user']['cognome'];?> -->
+                            &nbsp;
+                            <!-- TODO: <?php echo $_SESSION['user']['nome'].' '.$_SESSION['user']['cognome'];?> -->
                         </span>
                     </a>
                     <ul>
-                        <!--<li>
-                            <a class="text-decoration-none" href="pages/revisore.php" id="8">Revisione</a>
-                        </li>-->
                         <li>
                             <a class="<?php if($mact == 8) echo 'active'; ?> text-decoration-none" href="pages/profile.php" id="8">Profilo</a>
                         </li>
@@ -81,12 +82,40 @@
                 </li>
             </ul>
             <i class="bi bi-list mobile-nav-toggle" id="mobileMenu"></i>
-            <!-- <?php } ?> -->
-        </nav><!--.navbar-->
-        <!-- <?php if(!isset($_SESSION['user'])) {?>   
-            <a href="" id="logButton" class="text-decoration-none"><span class="bi bi-box-arrow-in-right"></span>&nbsp;Accedi</a>
-        <?php }?>-->
-  
+            <!-- TODO: <?php } ?> -->
+        </nav>
+        <!-- TODO: <?php if(!isset($_SESSION['user'])) {?>   -->
+            <a href="#" id="logButton" class="text-decoration-none" @click="showHideLoginModal()"><span class="bi bi-box-arrow-in-right"></span>&nbsp;Accedi</a>
+        <!-- TODO: <?php }?> -->
+        <Login v-show="modal" :show-hide-login-modal = "showHideLoginModal"></Login>
     </div>
 </header>
 </template>
+
+<script>
+import { menuScript } from '../js/menu.js'
+import { loginScript } from '../js/login.js'
+
+export default {
+    data() {
+        return {
+            modal: false
+        }
+    },
+    mounted() {
+        document.onreadystatechange = () => {
+        if (document.readyState == "complete") {
+            console.log('menu.js e login.js caricati')
+            menuScript()
+            loginScript()
+        }}
+    },
+    methods:
+    {
+        showHideLoginModal()
+        {
+            this.modal = !this.modal
+        }
+    }
+}
+</script>

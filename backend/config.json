@@ -1,20 +1,20 @@
 {
-    "sessionSecret": "mysecretkey",
-    "database": {
-        "host": "localhost",
-        "user": "root",
-        "password": "esedra",
-        "name": "nome_database",
-        "mailAdmin": "a@a.it",
-        "passwordAdmin": "a",
-        "emailLink": "a",
-        "socialLink": "a",
-        "webLink": "a",
-        "exists": "true",
-        "dbms": "My SQL"
-    },
-    "port": 3000,
-    "install": "true",
-    "sequelize": "true",
-    "resume": "1"
+  "sessionSecret": "mysecretkey",
+  "database": {
+    "host": "localhost",
+    "user": "root",
+    "password": "esedra",
+    "name": "nome_database",
+    "mailAdmin": "a@a.it",
+    "passwordAdmin": "a",
+    "emailLink": "a",
+    "socialLink": "a",
+    "webLink": "a",
+    "exists": "true",
+    "dbms": "My SQL"
+  },
+  "port": 3000,
+  "install": "true",
+  "sequelize": "true",
+  "resume": "1"
 }

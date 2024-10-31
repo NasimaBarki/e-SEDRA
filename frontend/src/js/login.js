@@ -1,6 +1,8 @@
 'use strict'
 
 export function loginScript() {
+    var apiBaseUrl = 'http://localhost:3000'
+
     function addKeyUpListener(ids, callback) {
         ids.forEach(id => {
             //console.log(id);
@@ -93,7 +95,7 @@ export function loginScript() {
 
             switch (formId) {
                 case 'login-form':
-                    url = 'ajax/chklogin.php';
+                    url = '/login';
                     break;
                 case 'register-form':
                     url = 'ajax/chktoken.php';
@@ -107,11 +109,20 @@ export function loginScript() {
             }
             // Prepara i dati da inviare
             let formData = new FormData(form);
+
+            var object = {}
+            for (var [key, value] of formData.entries()) {
+                object[key] = value
+            }
+
             //console.log(url);
             // Effettua la richiesta POST
-            fetch(url, {
+            fetch(apiBaseUrl + url, {
                 method: 'POST',
-                body: formData
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(object)
             })
                 .then(response => response.text())
                 .then(result => {
@@ -129,7 +140,7 @@ export function loginScript() {
                             case 'login-form':
                                 switch (result) {
                                     case 'K':
-                                        fetch('ajax/chkloglogin.php', {
+                                        fetch(apiBaseUrl + '/chkloglogin', {
                                             method: 'POST', // Metodo di invio dati al server
                                             headers: {
                                                 'Content-Type': 'application/x-www-form-urlencoded', // Specifica il tipo di contenuto
@@ -139,7 +150,7 @@ export function loginScript() {
                                             if (response.ok) {
                                                 //alert("Reindirizzo l'utente");
                                                 // Se la richiesta � andata a buon fine, reindirizza l'utente
-                                                window.location.href = 'index.php';
+                                                window.location.href = '/';
                                             } else {
                                                 // Gestisci eventuali errori di risposta
                                                 console.error('Richiesta fallita', response);

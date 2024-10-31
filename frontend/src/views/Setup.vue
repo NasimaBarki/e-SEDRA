@@ -33,7 +33,7 @@ import TheFooterSetup from '../components/TheFooterSetup.vue'
                     <option disabled selected hidden >Seleziona il DBMS </option>     
                     <option value="My SQL">My SQL</option>
                     <option value="SQL Server">SQL Server</option>
-                    <option value="SQL Server Express LocalDB">SQL Server Express LocalDB</option>
+                    <!-- <option value="SQL Server Express LocalDB">SQL Server Express LocalDB</option> -->
                 </select>
             </div>
             
@@ -110,19 +110,19 @@ import TheFooterSetup from '../components/TheFooterSetup.vue'
              </div>
         </fieldset>
         <div class="mb-2"><hr /></div>
-        <fieldset class="row align-items-end" form="formsetup">
-            <legend class="col-md-2">Percorso</legend>
-            <div class="col-md-4">             
-                <!-- TODO: <?php if(strlen($dir)==1 && $dir[0]=='/') echo 'checked';?> -->
-                <input  type="checkbox" class="form-check-input" id="domRoot" name="domRoot" disabled>
-                 <label class="form-label" for="domRoot">Dominio/sottodominio</label>
-            </div>
-             <div class="col-md-6">
-               <label class="form-label" for="cartRoot">Cartella:</label>
-                <input class="form-control" id="cartRoot" name="cartRoot" type="text" value="<?php echo $dir;?>" disabled/> 
-                <input type="hidden" id="myRoot" name="myRoot" value="<?php echo ROOT_PATH;?>" disabled />
-             </div>
-        </fieldset>
+            <fieldset class="row align-items-end" form="formsetup">
+                <legend class="col-md-2">Percorso</legend>
+                <div class="col-md-4">             
+                    <!-- TODO: <?php if(strlen($dir)==1 && $dir[0]=='/') echo 'checked';?> -->
+                    <input  type="checkbox" class="form-check-input" id="domRoot" name="domRoot" disabled>
+                    <label class="form-label" for="domRoot">Dominio/sottodominio</label>
+                </div>
+                <div class="col-md-6">
+                <label class="form-label" for="cartRoot">Cartella:</label>
+                    <input class="form-control" id="cartRoot" name="cartRoot" type="text" value="<?php echo $dir;?>" disabled/> 
+                    <input type="hidden" id="myRoot" name="myRoot" value="<?php echo ROOT_PATH;?>" disabled />
+                </div>
+            </fieldset>
         <!-- PROGRESS BAR -->
         <div class="progress  col-md-12 mt-3">
              <div id="myBar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-label="Avanzamento creazione tabelle db"  aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>

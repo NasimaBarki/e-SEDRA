@@ -12,12 +12,18 @@ const config = require('./config.json')
 // router
 var setupRouter = require('./routes/setup')
 var logerrorRouter = require('./routes/logerror')
+var loginRouter = require('./routes/login')
 
 // router setup
-var ambitiRouter = require('./routes/setup/ambiti')
-var spGetAmbitiRouter = require('./routes/setup/spGetAmbiti')
-var spSearchAmbitiRouter = require('./routes/setup/spSearchAmbiti')
-var spUpdateAmbitiRouter = require('./routes/setup/spUpdateAmbiti')
+var dbRouter = require('./routes/setup/0000db')
+var utentiRouter = require('./routes/setup/0001utenti')
+var ambitiRouter = require('./routes/setup/0009ambiti')
+var spGetAmbitiRouter = require('./routes/setup/0916spGetAmbiti')
+var spSearchAmbitiRouter = require('./routes/setup/0928spSearchAmbiti')
+var spUpdateAmbitiRouter = require('./routes/setup/0917spUpdateAmbiti')
+var spLoginRouter = require('./routes/setup/0900spLogin')
+var ruoliUtentiRouter = require('./routes/setup/0003ruoliUtenti')
+var ruoliRouter = require('./routes/setup/0002ruoli')
 
 // crea app express
 const app = express()
@@ -37,12 +43,18 @@ app.use(session({
 // REST API
 app.use('/', setupRouter)
 app.use('/', logerrorRouter)
+app.use('/', loginRouter)
 
 // Setup
+app.use('/', dbRouter)
 app.use('/', ambitiRouter)
 app.use('/', spGetAmbitiRouter)
 app.use('/', spSearchAmbitiRouter)
 app.use('/', spUpdateAmbitiRouter)
+app.use('/', utentiRouter)
+app.use('/', spLoginRouter)
+app.use('/', ruoliUtentiRouter)
+app.use('/', ruoliRouter)
 
 // attivazione server
 app.listen(config.port, () => {

@@ -8,14 +8,6 @@ const config = require('../../config.json')
 // setup router
 const router = express.Router()
 
-// aggiunta parentesi per mssql
-function toMsSQL(query) {
-    if (config.database.dbms == 'SQL Server') {
-        query.forE
-        return '{' + query + '}'
-    }
-}
-
 // query
 let resume = ''
 let autoinc = ''

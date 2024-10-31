@@ -59,7 +59,7 @@ router.post('/setup/start', (req, res) => {
     var filesList = []
 
     fs.readdirSync(path.resolve(__dirname, setupFolder)).forEach(file => {
-        filesList.push(file.split('.')[0])
+        filesList.push(file.split('.')[0].slice(4))
     })
 
     res.json(filesList)

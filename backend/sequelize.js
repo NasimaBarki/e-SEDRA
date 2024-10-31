@@ -3,12 +3,19 @@
 // import
 const { Sequelize } = require('sequelize')
 const config = require('./config.json')
+
+// se il database non esiste rimane vuoto
+let database = ''
+
+if (config.database.exists == 'true')
+    database = config.database.name
+
 let sequelize
 
 // init DB
 if (config.sequelize == 'true') {
     if (config.database.dbms == 'My SQL') {
-        sequelize = new Sequelize(config.database.name, config.database.user, config.database.password, {
+        sequelize = new Sequelize(database, config.database.user, config.database.password, {
             host: config.database.host,
             dialect: 'mysql',
             dialectOptions: {
@@ -29,7 +36,7 @@ if (config.sequelize == 'true') {
         //     }
         // })
 
-        sequelize = new Sequelize(config.database.name, config.database.user, config.database.password, {
+        sequelize = new Sequelize(database, config.database.user, config.database.password, {
             host: config.database.host,
             dialect: 'mssql',
             port: 51134,

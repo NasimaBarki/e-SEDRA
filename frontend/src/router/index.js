@@ -3,6 +3,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import Home from '../views/Home.vue'
 import Setup from '../views/Setup.vue'
 import Ambiti from '../views/Ambiti.vue'
+import Profilo from '../views/Profilo.vue'
 
 const routes = [
     {
@@ -19,6 +20,11 @@ const routes = [
         path: '/ambiti',
         name: 'Ambiti',
         component: Ambiti
+    },
+    {
+        path: '/profilo',
+        name: 'Profilo',
+        component: Profilo
     }
 ]
 

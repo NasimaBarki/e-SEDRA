@@ -14,10 +14,10 @@ import Login from './Login.vue'
             <img id="appText" src="../assets/esedratext1.png" title="logoEsedra" />
         </a>
         <a class="logo me-auto">
-            <img src="../assets/images/logo.png" alt="" class="img-fluid" />
+            <img src="../assets/logo.png" alt="" class="img-fluid" />
         </a>
 
-        <nav id="navbar" class="navbar order-last order-lg-0">
+        <nav v-show="user" id="navbar" class="navbar order-last order-lg-0">
             <ul>
                 <!-- TODO: <?php if(isset($_SESSION['user'])) {
                           $mact=$_SESSION['user']['menuAct'];
@@ -63,20 +63,24 @@ import Login from './Login.vue'
 
                 <!-- TODO: <?php if(isset($_SESSION['user'])) {?> -->
 
-                <li class="dropdown">
+                <li v-if="user" class="dropdown">
                     <a href="javascript:void(0);" class="no_link text-decoration-none">
                         <i class="bi bi-person-fill"></i>
                         <span>
                             &nbsp;
+                            {{ user.email }}
+                            <!-- {{ user.nome }} {{ user.cognome }} -->
                             <!-- TODO: <?php echo $_SESSION['user']['nome'].' '.$_SESSION['user']['cognome'];?> -->
                         </span>
                     </a>
                     <ul>
                         <li>
-                            <a class="<?php if($mact == 8) echo 'active'; ?> text-decoration-none" href="pages/profile.php" id="8">Profilo</a>
+                            <!-- <a class="<?php if($mact == 8) echo 'active'; ?> text-decoration-none" href="pages/profile.php" id="8">Profilo</a> -->
+                            <router-link to='/profilo' id="8" text-decoration-none>Profilo</router-link>
                         </li>
                         <li>
-                            <a class="text-decoration-none" href="include/logout.php" id="m_logout">Esci</a>
+                            <!--                             href="include/logout.php" -->
+                            <a class="text-decoration-none" @click="logout" id="m_logout">Esci</a>
                         </li>
                     </ul>
                 </li>
@@ -85,7 +89,7 @@ import Login from './Login.vue'
             <!-- TODO: <?php } ?> -->
         </nav>
         <!-- TODO: <?php if(!isset($_SESSION['user'])) {?>   -->
-            <a href="#" id="logButton" class="text-decoration-none" @click="showHideLoginModal()"><span class="bi bi-box-arrow-in-right"></span>&nbsp;Accedi</a>
+            <a v-if="!user" href="#" id="logButton" class="text-decoration-none" @click="showHideLoginModal()"><span class="bi bi-box-arrow-in-right"></span>&nbsp;Accedi</a>
         <!-- TODO: <?php }?> -->
         <Login v-show="modal" :show-hide-login-modal = "showHideLoginModal"></Login>
     </div>
@@ -96,7 +100,11 @@ import Login from './Login.vue'
 import { menuScript } from '../js/menu.js'
 import { loginScript } from '../js/login.js'
 
+import axios from 'axios'
+
 export default {
+    props: ['user'],
+
     data() {
         return {
             modal: false
@@ -107,7 +115,7 @@ export default {
         if (document.readyState == "complete") {
             console.log('menu.js e login.js caricati')
             menuScript()
-            loginScript()
+            loginScript(this.updateUser)
         }}
     },
     methods:
@@ -115,6 +123,16 @@ export default {
         showHideLoginModal()
         {
             this.modal = !this.modal
+        },
+        updateUser(newUser) {
+            localStorage.setItem('user', JSON.stringify(newUser))
+            this.$router.go()
+        },
+        logout() {
+            console.log('logout')
+            localStorage.removeItem('user')
+            
+            this.$router.push({ name: 'Home' }).then(() => {this.$router.go(0)})
         }
     }
 }

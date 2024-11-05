@@ -7,7 +7,6 @@ const bcrypt = require('bcrypt')
 var passport = require('passport')
 var LocalStrategy = require('passport-local')
 
-
 // file di configurazione
 const configPath = './config.json'
 const config = require('../config.json')
@@ -38,8 +37,6 @@ router.post('/login', async (req, res) => {
             type = true
         }
 
-        console.log(body.EMAIL)
-
         const results = await sequelize.query(query, {
             ...type && { replacements: { usn: body.EMAIL, scPsw: scPsw } },
             ...type && { type: sequelize.QueryTypes.SELECT }
@@ -47,8 +44,55 @@ router.post('/login', async (req, res) => {
 
         const match = await bcrypt.compare(body.PSW, results[0][0].psw)
 
-        if (results != 0 && match)
-            res.send('K')
+        if (results != 0 && match) {
+            results.pop()
+
+            let results1 = []
+
+            for (let i = 0; i < Object.keys(results).length; i++) {
+                results1.push(results[1][i])
+            }
+
+            let rows = results1.map(item => item)
+
+            let results0 = [results[0]['0']]
+
+            let user = undefined
+
+            if (rows.length >= 1) {
+                user = results0[0]
+
+                delete user.psw
+                delete user.ruolo
+                delete user.ruoloNU
+                delete user.subruolo
+                delete user.subruoloNU
+                user.roles = {}
+
+                rows.forEach(row => {
+                    if (row.ruolo)
+                        user.roles[row.ruoloNU] = [row.ruolo]
+
+                    if (row.subruolo) {
+                        let key = JSON.stringify(row.subruoloNU)
+                        var obj = {}
+
+                        obj[key] = row.subruolo
+
+                        user.roles[row.ruoloNU].push(JSON.stringify(obj))
+                    }
+                })
+
+                user["R"] = 'K'
+            }
+
+            console.log(user)
+
+            res.send(user)
+        }
+        else {
+            res.send({ 'R': 'X' })
+        }
     } catch (error) {
         console.log(error)
         res.status(500).send('X')

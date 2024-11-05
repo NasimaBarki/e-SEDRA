@@ -8,25 +8,26 @@ import Setup from './views/Setup.vue'
 <Setup v-if="setup"></Setup>
 
 <div v-else>
-    <TheMenu></TheMenu>
+    <TheMenu @user="updateUser" :user = 'user'></TheMenu>
     <div id="contentPage" class="flex-shrink-0">  
-        <router-view/>
+        <router-view :user = 'user'/>
     </div>
     <TheFooter></TheFooter>
 </div>
 </template>
 
 <script>
-
 import axios from 'axios'
 
 export default {
     data() {
         return {
-            setup: false
+            setup: false,
+            user: JSON.parse(localStorage.getItem('user'))
         }
     },
     mounted() {
+        console.log('session: ', this.user)
         this.isSetup()
     },
     methods:
@@ -46,6 +47,10 @@ export default {
                 .catch((error) => {
                     console.log(error)
                 })
+        },
+        updateUser(newUser) {
+            this.user = newUser;
+            console.log("User updated in parent:", this.user);
         }
     }
 }

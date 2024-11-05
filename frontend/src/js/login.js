@@ -1,7 +1,15 @@
 'use strict'
 
-export function loginScript() {
+export function loginScript(updateUserCallback) {
     var apiBaseUrl = 'http://localhost:3000'
+    var user = undefined
+
+    function updateUserData(newUserData) {
+        user = newUserData
+        if (typeof updateUserCallback === 'function') {
+            updateUserCallback(newUserData); // Call the callback with the new user data
+        }
+    }
 
     function addKeyUpListener(ids, callback) {
         ids.forEach(id => {
@@ -135,10 +143,11 @@ export function loginScript() {
                     }
                     // Continua con le altre condizioni...
                     else {
+                        result = JSON.parse(result)
                         //alert("form ID " + formId);
                         switch (formId) {
                             case 'login-form':
-                                switch (result) {
+                                switch (result["R"]) {
                                     case 'K':
                                         fetch(apiBaseUrl + '/chkloglogin', {
                                             method: 'POST', // Metodo di invio dati al server
@@ -151,6 +160,7 @@ export function loginScript() {
                                                 //alert("Reindirizzo l'utente");
                                                 // Se la richiesta � andata a buon fine, reindirizza l'utente
                                                 window.location.href = '/';
+                                                updateUserData(result)
                                             } else {
                                                 // Gestisci eventuali errori di risposta
                                                 console.error('Richiesta fallita', response);

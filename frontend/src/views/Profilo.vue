@@ -11,6 +11,7 @@
                             <h4>
                                 <span class="bi bi-person-badge"></span>
                                 <!-- TODO: <?php echo '&nbsp;'.$_SESSION['user']['nome'].' '.$_SESSION['user']['cognome']; ?> -->
+                                 {{ user.nome }} {{ user.cognome }}
 
                             </h4>
                             <input type="hidden" id="nome" value="<?php echo $_SESSION['user']['nome']; ?>" />
@@ -26,7 +27,9 @@
                                     <input type="email" class="form-control form-control-plaintext" v-model="user.email" disabled />
                                 </div>
                             </div>
-                            <h6 class="card-subtitle mb-2 text-muted">
+                            <h6 v-for="role in user.roles" class="card-subtitle mb-2 text-muted">
+                                {{ role[0] }}
+                                {{ role[1] }}
                                 <!-- TODO: <?php
                             $ruoli=$_SESSION['user']['roles'];
                             foreach ($ruoli as $r)
@@ -45,24 +48,25 @@
                             <div class="card-text">
                                 <form id="formtel">
                                     <div class="form-floating mb-3">
-                                        <input type="tel" class="form-control" id="mycell" name="cell" value="<?php echo $_SESSION['user']['cell']; ?>" />
+                                        <input type="tel" class="form-control" id="mycell" name="cell" v-model="user.cell" />
                                         <label for="mycell" class="form-label">Telefono</label>
                                     </div>
                                     <div class="form-floating mb-3">
-                                        <input type="text" class="form-control" id="mycod" name="cod" value="<?php echo $_SESSION['user']['cod']; ?>" />
+                                        <input type="text" class="form-control" id="mycod" name="cod" v-model="user.cod" />
                                         <label for="mycod" class="form-label">Codice</label>
                                     </div>
                                 </form>
                                 <div class="row">
                                     <div class="form-floating mb-3 col-md-6">
                                         <!--                                                                               <?php echo date("d-m-Y H:i", strtotime($_SESSION['user']['dtPsw']));?> -->
-                                        <input type="text" class="form-control form-control-plaintext" id="mydateP" value="" disabled />
+                                        <input type="text" class="form-control form-control-plaintext" id="mydateP" v-model="dtPsw" disabled />
 
 
                                         <label for="mydateP" class="form-label">Creazione password</label>
                                     </div>
                                     <div class="form-floating mb-3 col-md-6">
-                                        <input type="text" class="form-control form-control-plaintext" id="mygP" value="<?php if(isset($_SESSION['user']['ggScPsw'])) echo $_SESSION['user']['ggScPsw']; ?>" disabled />
+                                        <!-- value="<?php if(isset($_SESSION['user']['ggScPsw'])) echo $_SESSION['user']['ggScPsw']; ?>" -->
+                                        <input type="text" class="form-control form-control-plaintext" id="mygP" v-model="user.ggScPsw" disabled />
 
 
                                         <label for="mygP" class="form-label">Giorni scadenza password</label>
@@ -77,6 +81,7 @@
                             <small class="text-muted text-md-end">
                                 <!-- TODO: <?php //$date = new DateTimeImmutable('now', new DateTimeZone('Europe/Rome'));
                                 echo $now->format('d-m-Y H:i');  ?> -->
+                                {{ dtNow }}
                             </small>
                         </div>
 
@@ -153,9 +158,18 @@
 </template>
 
 <script>
+
 export default {
     props: ['user'],
+    data() {
+        return {
+            dtNow: new Date().toLocaleDateString('it-IT').replaceAll('/', '-') + ' ' + new Date().toLocaleTimeString('it-IT', {hour: '2-digit', minute:'2-digit'}),
+            dtPsw: new Date(this.user.dtPsw).toLocaleDateString('it-IT').replaceAll('/', '-') + ' ' + new Date(this.user.dtPsw).toLocaleTimeString('it-IT', {hour: '2-digit', minute:'2-digit'})
+        }
+    },
     mounted() {
+
+        // codice originale
         function savetelefono() {
         var tel = document.getElementById("mycell");
         var num = tel.value;

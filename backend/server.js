@@ -13,6 +13,7 @@ const config = require('./config.json')
 var setupRouter = require('./routes/setup')
 var logerrorRouter = require('./routes/logerror')
 var loginRouter = require('./routes/login')
+var configRouter = require('./routes/config')
 
 // router setup
 var dbRouter = require('./routes/setup/0000db')
@@ -24,6 +25,12 @@ var spUpdateAmbitiRouter = require('./routes/setup/0917spUpdateAmbiti')
 var spLoginRouter = require('./routes/setup/0900spLogin')
 var ruoliUtentiRouter = require('./routes/setup/0003ruoliUtenti')
 var ruoliRouter = require('./routes/setup/0002ruoli')
+var logsRouter = require('./routes/setup/0040logs')
+var spSetLogLogoutRouter = require('./routes/setup/0909spSetLogLogout')
+var spSetLogLoginRouter = require('./routes/setup/0908spSetLogLogin')
+var spGetRuoliAllRouter = require('./routes/setup/0912spGetRuoliAll')
+var spGetRuoliTreeRouter = require('./routes/setup/0911spGetRuoliTree')
+var subRuoliRouter = require('./routes/setup/0004subRuoli')
 
 // crea app express
 const app = express()
@@ -44,6 +51,7 @@ app.use(session({
 app.use('/', setupRouter)
 app.use('/', logerrorRouter)
 app.use('/', loginRouter)
+app.use('/', configRouter)
 
 // Setup
 app.use('/', dbRouter)
@@ -55,6 +63,12 @@ app.use('/', utentiRouter)
 app.use('/', spLoginRouter)
 app.use('/', ruoliUtentiRouter)
 app.use('/', ruoliRouter)
+app.use('/', logsRouter)
+app.use('/', spSetLogLogoutRouter)
+app.use('/', spSetLogLoginRouter)
+app.use('/', spGetRuoliAllRouter)
+app.use('/', spGetRuoliTreeRouter)
+app.use('/', subRuoliRouter)
 
 // attivazione server
 app.listen(config.port, () => {

@@ -20,7 +20,8 @@ if (config.database.dbms == 'My SQL')
 			SELECT @num:=COUNT(*) AS X, utenti.idUs, @dtStart AS dtStart,
 			DATEDIFF(DATE_ADD(utenti.dtPsw, INTERVAL scPsw MONTH), @dtStart) AS ggScPsw,
 			utenti.email, utenti.psw
-			FROM utenti WHERE utenti.email=email;
+			FROM utenti WHERE utenti.email=email
+            GROUP BY utenti.idUs;
 		ELSE
  			SELECT @num:=COUNT(*) AS X, utenti.idUs, @dtStart AS dtStart,
 			utenti.email, utenti.psw

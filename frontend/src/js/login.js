@@ -152,9 +152,9 @@ export function loginScript(updateUserCallback) {
                                         fetch(apiBaseUrl + '/chkloglogin', {
                                             method: 'POST', // Metodo di invio dati al server
                                             headers: {
-                                                'Content-Type': 'application/x-www-form-urlencoded', // Specifica il tipo di contenuto
+                                                'Content-Type': 'application/json'
                                             },
-                                            body: 'X=X' // Dati inviati al server
+                                            body: JSON.stringify(result) // Dati inviati al server
                                         }).then(response => {
                                             if (response.ok) {
                                                 //alert("Reindirizzo l'utente");

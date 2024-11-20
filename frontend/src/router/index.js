@@ -4,6 +4,9 @@ import Home from '../views/Home.vue'
 import Setup from '../views/Setup.vue'
 import Ambiti from '../views/Ambiti.vue'
 import Profilo from '../views/Profilo.vue'
+import Utenti from '../views/Utenti.vue'
+import Logfile from '../views/Logfile.vue'
+import Generale from '../views/Generale.vue'
 
 const routes = [
     {
@@ -25,6 +28,21 @@ const routes = [
         path: '/profilo',
         name: 'Profilo',
         component: Profilo
+    },
+    {
+        path: '/utenti',
+        name: 'Utenti',
+        component: Utenti
+    },
+    {
+        path: '/logfile',
+        name: 'LogFile',
+        component: Logfile
+    },
+    {
+        path: '/generale',
+        name: 'generale',
+        component: Generale
     }
 ]
 

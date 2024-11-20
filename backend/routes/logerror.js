@@ -2,7 +2,6 @@
 
 // import moduli
 const express = require('express')
-var bodyParser = require('body-parser')
 
 // setup router
 const router = express.Router()

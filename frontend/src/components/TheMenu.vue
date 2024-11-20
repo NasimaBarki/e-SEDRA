@@ -41,7 +41,8 @@ import Login from './Login.vue'
                     </a>
                     <ul>
                         <li>
-                            <a class="<?php if($mact == 3) echo 'active'; ?> text-decoration-none" href="adminsez/admin/admconfgen.php" id="3">Generale</a>
+                            <!-- <a class="<?php if($mact == 3) echo 'active'; ?> text-decoration-none" href="adminsez/admin/admconfgen.php" id="3">Generale</a> -->
+                            <router-link to='/generale' text-decoration-none>Generale</router-link>
                         </li>
                         <li>
                             <a class="<?php if($mact == 4) echo 'active'; ?> text-decoration-none" href="adminsez/admin/admconfact.php" id="4">Attivit&agrave;</a>
@@ -51,10 +52,12 @@ import Login from './Login.vue'
                             <!-- <a class="<?php if($mact == 5) echo 'active'; ?> text-decoration-none" href="adminsez/admin/topics.php" id="5">Ambiti</a> -->
                         </li>
                         <li>
-                            <a class="<?php if($mact == 6) echo 'active'; ?> text-decoration-none" href="adminsez/admin/users.php" id="6">Utenti</a>
+                            <!-- <a class="<?php if($mact == 6) echo 'active'; ?> text-decoration-none" href="adminsez/admin/users.php" id="6">Utenti</a> -->
+                            <router-link to='/utenti' id="6" text-decoration-none>Utenti</router-link>
                         </li>
                         <li>
-                            <a class="<?php if($mact == 7) echo 'active'; ?> text-decoration-none" href="adminsez/admin/admlogs.php" id="7">LogFile</a>
+                            <!-- <a class="<?php if($mact == 7) echo 'active'; ?> text-decoration-none" href="adminsez/admin/admlogs.php" id="7">LogFile</a> -->
+                            <router-link to='/logfile' id="7" text-decoration-none>LogFile</router-link>
                         </li>
                     </ul>
                 </li>
@@ -68,7 +71,7 @@ import Login from './Login.vue'
                         <i class="bi bi-person-fill"></i>
                         <span>
                             &nbsp;
-                            {{ user.email }}
+                            {{ user.nome }} {{ user.cognome }}
                             <!-- {{ user.nome }} {{ user.cognome }} -->
                             <!-- TODO: <?php echo $_SESSION['user']['nome'].' '.$_SESSION['user']['cognome'];?> -->
                         </span>
@@ -128,8 +131,11 @@ export default {
             localStorage.setItem('user', JSON.stringify(newUser))
             this.$router.go()
         },
-        logout() {
+        async logout() {
             console.log('logout')
+            await axios.post(this.apiBaseUrl + '/logout', {
+                data: JSON.stringify(this.user)
+            })
             localStorage.removeItem('user')
             
             this.$router.push({ name: 'Home' }).then(() => {this.$router.go(0)})

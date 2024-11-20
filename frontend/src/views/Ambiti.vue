@@ -134,9 +134,10 @@
 
 <script>
 import axios from 'axios'
-import { topicScript } from '../js/topics'
+//import { topicScript } from '../js/topics'
 
 export default {
+    inheritAttrs: false,
     data() {
         return {
             isEditingTopic: false,
@@ -147,12 +148,13 @@ export default {
         }
     },
     mounted() {
-        this.fetchTopics()
+        this.fetchTopics() 
 
         document.onreadystatechange = () => {
         if (document.readyState == "complete") {
             console.log('topics.js caricato')
-            topicScript()
+            //topicScript()
+            import('../js/topics.js')  
         }}
     },
     methods:

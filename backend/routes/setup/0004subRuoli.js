@@ -8,42 +8,29 @@ const config = require('../../config.json')
 // setup router
 const router = express.Router()
 
-let type = undefined
-
 // query
 let resume = ''
 let autoinc = ''
-let bit = ''
+let type = undefined
+let queryInsert = `INSERT INTO subRuoli (ruolo, subruolo) VALUES
+(2,7),(2,8),(2,9),(2,10),(3,8),(3,10),(4,8),(4,10),(5,7),(5,8),(5,10),(3,12),(2,11),(3,11),(4,11),(5,11);`
 
-let queryInsert = `INSERT INTO ruoli (primario, ruolo) VALUES
-    (1,'Amministratore'),(1,'Studente'),
-    (1,'Docente'),(1,'Personale ATA'),(1,'Genitore'),
-    (1, 'DSGA'),
-    (0,'Rappresentante di Classe'),
-    (0,'Rappresentante di Istituto'),
-    (0,'Membro della Consulta'),
-    (0,'Membro del Comitato'),
-    (0,'Partecipante Focus'),
-    (0,'Commissione PTOF');`
-
-if (config.database.dbms == 'My SQL') {
+if (config.database.dbms == 'My SQL')
     autoinc = 'AUTO_INCREMENT'
-    bit = '(1)'
-}
-
-else if (config.database.dbms == 'SQL Server') {
+else if (config.database.dbms == 'SQL Server')
     autoinc = 'IDENTITY(1,1)'
-}
 
-let query = `CREATE TABLE ruoli (
-    idRl  INT ` + autoinc + ` NOT NULL PRIMARY KEY,
-    ruolo VARCHAR (30) NOT NULL,
-    primario BIT` + bit + ` DEFAULT 0
+let query = `CREATE TABLE subRuoli (
+    idSbRl INT ${autoinc} NOT NULL PRIMARY KEY,
+    ruolo  INT NOT NULL,
+    subRuolo INT NOT NULL,
+    FOREIGN KEY (ruolo) REFERENCES ruoli(IdRl) ON DELETE CASCADE,
+    FOREIGN KEY (subRuolo) REFERENCES ruoli(IdRl) ON DELETE NO ACTION
 );`
 
-router.post('/ruoli', async (req, res) => {
+router.post('/subRuoli', async (req, res) => {
     if (config.resume != '0') {
-        resume = 'DROP TABLE IF EXISTS ruoli'
+        resume = 'DROP TABLE IF EXISTS subRuoli'
     }
 
     try {
@@ -61,7 +48,7 @@ router.post('/ruoli', async (req, res) => {
             type: sequelize.QueryTypes.INSERT
         })
 
-        res.send('Table ruoli creata...')
+        res.send('Table subRuoli creata')
     } catch (error) {
         console.log(error)
         res.sendStatus(500)

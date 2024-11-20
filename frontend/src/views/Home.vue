@@ -44,3 +44,9 @@ import Banner from '../components/Banner.vue'
 <!--</div>-->
 </section>
 </template>
+
+<script>
+export default {
+    inheritAttrs: false
+}
+</script>

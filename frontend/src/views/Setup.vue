@@ -147,6 +147,7 @@ import TheFooterSetup from '../components/TheFooterSetup.vue'
 <script>
 
 export default {
+    inheritAttrs: false,
     mounted() {
         var apiBaseUrl = this.apiBaseUrl
         

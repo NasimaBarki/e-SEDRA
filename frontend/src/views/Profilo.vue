@@ -27,9 +27,8 @@
                                     <input type="email" class="form-control form-control-plaintext" v-model="user.email" disabled />
                                 </div>
                             </div>
-                            <h6 v-for="role in user.roles" class="card-subtitle mb-2 text-muted">
-                                {{ role[0] }}
-                                {{ role[1] }}
+                            <h6 class="card-subtitle mb-2 text-muted">
+                                {{ user.ruolo }}
                                 <!-- TODO: <?php
                             $ruoli=$_SESSION['user']['roles'];
                             foreach ($ruoli as $r)

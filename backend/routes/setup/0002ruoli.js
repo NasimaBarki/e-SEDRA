@@ -8,6 +8,10 @@ const config = require('../../config.json')
 // setup router
 const router = express.Router()
 
+const bodyParser = require('body-parser')
+router.use(bodyParser.json()); // support json encoded bodies
+router.use(express.urlencoded({ extended: true })); // support encoded bodies
+
 let type = undefined
 
 // query
@@ -65,6 +69,65 @@ router.post('/ruoli', async (req, res) => {
     } catch (error) {
         console.log(error)
         res.sendStatus(500)
+    }
+})
+
+router.post('/updruoli', async (req, res) => {
+    req.headers['content-type'] = 'application/x-www-form-urlencoded'
+    let body = req.body
+
+    console.log('BODY: ', body)
+
+    try {
+        if (config.database.dbms == 'SQL Server') {
+            query = 'updRuoli @idRl=\'' + body.idRl + '\', @idRs=\'' + body.idRs +
+                '\', @ruolo=\'' + body.val + '\';'
+
+            type = false
+        }
+        else if (config.database.dbms == 'My SQL') {
+            query = 'CALL updRuoli(:idRl, :idRs, :ruolo)'
+
+            type = true
+        }
+
+        await sequelize.query(query, {
+            ...type && { replacements: { idRl: body.idRl, idRs: body.idRs, ruolo: body.val } }
+        })
+
+        // getRuoliAll
+        if (config.database.dbms == 'SQL Server') {
+            query = 'EXEC getRuoliAll'
+
+            type = false
+        }
+        else if (config.database.dbms == 'My SQL') {
+            query = 'CALL getRuoliAll'
+
+            type = true
+        }
+
+        const [results, metadata] = await sequelize.query(query, {
+            ...type && { type: sequelize.QueryTypes.SELECT }
+        })
+
+        if (results) {
+            if (config.database.dbms == 'My SQL') {
+                for (const row of Object.entries(results)) {
+                    let num = JSON.stringify(row[1].primario).slice(-3, JSON.stringify(row[1].primario).length - 2)
+                    row[1].primario = parseInt(num)
+                }
+            }
+            console.log(results)
+            res.set('Content-Type', 'application/json')
+            res.json(results)
+        } else {
+            console.log('Niente ruoli')
+            res.json(null)
+        }
+    } catch (error) {
+        console.log(error)
+        res.status(500).send('Errore query updRuoli')
     }
 })
 

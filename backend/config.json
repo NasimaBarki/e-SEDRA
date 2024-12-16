@@ -4,7 +4,7 @@
     "host": "localhost",
     "user": "root",
     "password": "esedra",
-    "name": "nome_database",
+    "name": "database5",
     "mailAdmin": "a@a.it",
     "passwordAdmin": "a",
     "emailLink": "a",
@@ -16,10 +16,10 @@
   "port": 3000,
   "install": "true",
   "sequelize": "true",
-  "resume": "0",
-  "scPsw": 0,
-  "ggMsgPsw": 0,
-  "delLog": 3,
-  "scTkn": 0,
-  "emailNoRep": ""
+  "resume": "1",
+  "scPsw": "3",
+  "ggMsgPsw": "5",
+  "delLog": "3",
+  "scTkn": "0",
+  "emailNoRep": "email@gmail.com"
 }

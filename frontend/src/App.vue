@@ -27,7 +27,7 @@ export default {
         }
     },
     mounted() {
-        // console.log('logged in user: ', JSON.stringify(this.user))
+        // console.log('logged in user: ', JSON.stringify(this.user))   
         this.isSetup()
     },
     methods:

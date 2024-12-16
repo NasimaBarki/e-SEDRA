@@ -134,7 +134,6 @@
 
 <script>
 import axios from 'axios'
-//import { topicScript } from '../js/topics'
 
 export default {
     inheritAttrs: false,
@@ -147,15 +146,15 @@ export default {
             valenza: null
         }
     },
-    mounted() {
+    beforeMount() {
+        console.log('beforeMount')
+         
         this.fetchTopics() 
+        import('../js/topics.js')
 
-        document.onreadystatechange = () => {
-        if (document.readyState == "complete") {
-            console.log('topics.js caricato')
-            //topicScript()
-            import('../js/topics.js')  
-        }}
+    },
+    mounted() {
+        console.log('mounted')
     },
     methods:
     {

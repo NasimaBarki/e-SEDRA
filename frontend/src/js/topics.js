@@ -1,6 +1,8 @@
 'use strict'
 
-var apiBaseUrl = 'http://localhost:3000'
+import { config } from "../../config"
+
+var apiBaseUrl = config.$api_url
 
 // topics.js
 var myMdT;
@@ -24,6 +26,7 @@ function call_close_form() {
 }
 
 ready(function () {
+    console.log('eao')
     formTOPIC = document.getElementById('formTOPIC');
     var mmt = document.getElementById('myModalTopic');
     if (mmt) {
@@ -60,7 +63,7 @@ ready(function () {
 
     tptable = document.querySelector('#topicTable');
     //console.log(tptable);
-    tptable.addEventListener("click", (e) => {
+    tptable?.addEventListener("click", (e) => {
         if (e.target.nodeName != 'BUTTON' && e.target.nodeName != 'SPAN') { /*//console.log('- '+e.target);*/  return; }
         //let edt = e.target.closest('.spedit');
         let elem = e.target;

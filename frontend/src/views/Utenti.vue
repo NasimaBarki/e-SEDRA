@@ -1,4 +1,9 @@
+<script setup>
+import Ruoli from '../components/Ruoli.vue'
+</script>
+
 <template>
+
 <section class="container" id="userconf">
     <h2 class="page-title mt-3">Gestione Utenti</h2>
     <hr />
@@ -27,14 +32,14 @@
                              
 					-->
                                 <fieldset id="allElements" class="row g-3 align-items-center">
-                                    <input type="hidden" id="IDModUser" name="user_id" value="<?php if(isset($editU['idUs'])) echo $editU['idUs'] ?>" />
+                                    <input type="hidden" id="IDModUser" name="user_id" v-bind:value="editU.idUs" />
                                     <!-- if editing user, the id is required to identify that user -->
                                     
                                     <div class="col-12">
                                        
                                         <div class="input-group">
                                             <div class="input-group-text">@</div>
-                                            <input type="email" class="form-control" id="email" name="email" value="" placeholder="* Email" required />
+                                            <input type="email" class="form-control" id="e-mail" name="email" value="" placeholder="* Email" required />
                                         </div>
                                         <!--<label for="email" class="form-label">Email</label>-->
                                     </div>
@@ -63,20 +68,17 @@
                                       
                                         <!--                                                                                                    <?php date_default_timezone_set('Europe/Rome');
                                     echo str_replace(" ", "T", date('Y-m-d H:i'));?>" -->
-                                        <input type="datetime-local" class="form-control form-control-plaintext" id="dtPsw" name="dtPsw" value=""
+                                        <input type="datetime-local" class="form-control form-control-plaintext" id="dtPsw" name="dtPsw" v-model="dtNow"
                                             disabled />
 
-                                        <label for="dtPsw" class="form-label">Data creazione password</label>
+                                        <label for="dtPsw" class="form-label">
+                                            Data creazione password</label>
                                     </div>
                                     <div class="form-floating col-md-6">
                                         <input type="text" class="form-control form-control-plaintext" id="dtscPsw" name="dtscPsw" value="" disabled />
                                         <label for="dtscPsw" class="form-label">Giorni scadenza password</label>
                                     </div>
-                                    <!-- <?php
-                                    $_SESSION['template']['title']='Ruoli utente (* &egrave; richiesto almeno UN ruolo primario)';
-                                    //array_push($_SESSION['template']['ruoli'],'TR0');
-                                    //$_SESSION['template']['numberAct']=0;
-			                        include(ROOT_PATH . '/adminsez/includes/templateruoli.php');?> -->
+                                    <Ruoli :title="title" :ruoli="ruoli"></Ruoli>                     
 
                                 </fieldset>
                                 <!-- if editing user, display the update button instead of create button 
@@ -104,23 +106,18 @@
                                     <label class="form-control-label">Ruolo primario:</label>
                                     <div id="RuoliPrim" class="col-12 mb-3">
                                         <div class="btn-group" role="group" aria-label="Elenco Ruoli Primari">
-                                            <!-- <?php
-                                            foreach($rolesP as $rol)
-                                            {
-						                        $rid=$rol['idRl'];
-                                            ?> -->
-                                                <input type="radio" class="btn-check p-2" name="Irprim" id="Irp<?php echo $rid?>" value="<?php echo $rid?>" autocomplete="off" />
-                                                <label class="btn btn-outline-primary p-2" for="Irp<?php echo $rid?>">
+                                            <template v-for="ruolo in ruoli">
+                                                <input type="radio" class="btn-check p-2" name="Irprim" v-bind:id="'Irp' + ruolo['idRl']" v-bind:value="ruolo['idRl']" autocomplete="off" @change="bottonePrimarioChecked = true"/>
+                                                <label class="btn btn-outline-primary p-2" v-bind:for="'Irp' + ruolo['idRl']">
                                                     <!-- <?php echo $rol['ruolo']?> -->
+                                                     {{ ruolo['ruolo'] }}
                                                 </label>
-                                            <!-- <?php
-                                            }
-                                            ?> -->
+                                            </template>
                                         </div>
                                     </div>
 
                                     <div class="input-group col-md-6 mb-3">
-                                        <input type="file" class="form-control" name="fileToUpload" id="fileToUpload" /><!--style="opacity:0;"-->
+                                        <input type="file" class="form-control" name="fileToUpload" id="fileToUpload" @click="checkIfFileSelected" :disabled="!bottonePrimarioChecked"/><!--style="opacity:0;"-->
                                     </div>
                                     
                                     <div class="col-12 text-md-end">
@@ -150,23 +147,17 @@
             <form name="alphaform" method="POST" action="" class="mb-2 ">
                 <nav class="alfa pagination btn-group justify-content-center" role="group" aria-label="Alfabeto per sottogruppi utenti">
                     <!--                                                                                         <?php if(isset($_SESSION['search']) && $_SESSION['search']==='%') echo 'checked';?> -->
-                    <input type="radio" class="btn-check p-1" name="alfa" id="rall" value="%" autocomplete="off" />
+                    <input :checked="search === '%'" type="radio" class="btn-check p-1" name="alfa" id="rall" value="%" autocomplete="off" />
                     <label class="btn btn-outline-primary p-1" for="rall">Tutti</label>
-                    <input type="hidden" id="search" value="<?php if(isset($_SESSION['search'])) echo $_SESSION['search'];?>" />
-                    {{ alf }}
-                    <!-- <?php
-                            $alf="abcdefghijklmnopqrstuvwxyz";
-
-                            for($l=0;$l<strlen($alf);$l++)
-                            {
-                                $c=$alf[$l];
-                                $s=$c."%";
-                    ?>                                       -->
-                    <!-- <?php if(isset($_SESSION['search']) && $_SESSION['search']===$s) echo 'checked'; ?> -->
-                    <input type="radio" class="btn-check p-1" name="alfa" id="r<?php echo $c?>" value="<?php echo $s?>" autocomplete="off"/>
-                    <label class="btn btn-outline-primary p-1" for="r<?php echo $c?>">
-                        <!-- <?php echo strtoupper($c); ?> -->
-                    </label>
+                    <input type="hidden" id="search" v-bind:value="search" />
+                   
+                     <template v-for="letter in alf">
+                        <input :checked="search === letter + '%'" type="radio" class="btn-check p-1" name="alfa" v-bind:id="letter" v-bind:value="letter + '%'" autocomplete="off"/>
+                        <label class="btn btn-outline-primary p-1" v-bind:for="letter">
+                            <!-- <?php echo strtoupper($c); ?> -->
+                            {{ letter.toUpperCase() }}
+                        </label>
+                     </template>
                     <!-- <?php
                             }
                     ?> -->
@@ -192,16 +183,6 @@
                             &nbsp;&nbsp;Pag. <span id="pagina_attuale">--</span> di <span id="pagine_totali">--</span>
                         </a>
                     </li>
-
-                    <!--<li class="page-item">
-            <a class="page-link" href="">1</a>
-        </li>
-        <li class="page-item">
-            <a class="page-link" href="">2</a>
-        </li>
-        <li class="page-item">
-            <a class="page-link" href="">3</a>
-        </li>-->
                     <li class="page-item">
                         <button type="button" class="page-link" id="nextP" href="" aria-label="Next">
                             <span aria-hidden="true" class="bi bi-arrow-right-square"></span>
@@ -232,21 +213,86 @@
         </div>
     </div>
 </section>
+
+<!-- Modal HTML -->
+<div id="myModalCancel" class="modal fade" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Attenzione</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Premi conferma se vuoi eliminare l'utente.</p>	
+                    <p class="text-secondary"><small>Operazione irreversibile!</small></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="closeModalCancel" class="btn btn-primary" data-bs-dismiss="modal">Annulla</button>
+                    <button type="button" id="cancelUser" class="btn btn-secondary">Conferma</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </template>
 
 <script>
+import axios from 'axios'
+
 export default {
+    inheritAttrs: false,
     data() {
         return {
-            alf: 'abcdefghijklmnopqrstuvwxyz'
+            alf: 'abcdefghijklmnopqrstuvwxyz'.split(''),
+            search: 'a%',
+            editU: 0,
+            title: 'Ruoli utente (* &egrave; richiesto almeno UN ruolo primario)',
+            ruoli: [],
+            bottonePrimarioChecked: false,
+            dtNow: new Date().toISOString().slice(0, 16)  
         }
     },
+    beforeMount() {
+        import('../js/ruoliscript.js')
+        import('../js/users.js')
+    },
     mounted() {
-        document.onreadystatechange = () => {
-        if (document.readyState == "complete") {
-            console.log('users.js caricato')
-            import('../js/users.js')
-        }}
+        this.selectPrimaryRoles()
+    },
+    methods: {
+        async selectPrimaryRoles() {
+            let res = await axios.get(this.apiBaseUrl + '/getRuoliAll')
+            res = JSON.parse(res.data)
+
+            this.ruoli = Object.keys(res)
+            .map(key => ({idRl: res[key].idRl, ruolo: res[key].ruolo, primario: res[key].primario}))
+
+            // aggiunta dei ruoli secondari collegati al primario
+            for(let i = 0; i < this.ruoli.length; i++) {
+                if(this.ruoli[i].primario == 1)
+                    this.selectSecondaryRoles(i)
+            }
+
+            // rimozione dei ruoli secondari dall'array
+            this.ruoli = this.ruoli.filter(obj => {
+                return obj.primario == 1
+            })
+        },
+        async selectSecondaryRoles(index) {
+            let res = await axios.post(this.apiBaseUrl + '/getRuoliSec', {
+                data: JSON.stringify(this.ruoli[index])
+            })
+            
+            if(res.data[0].idS) {
+                this.ruoli[index].sub = res.data
+            }
+        },
+        checkIfFileSelected(event) {
+            var samplefile = document.getElementsByName("fileToUpload")[0];
+
+            if(!this.bottonePrimarioChecked) {
+                divMessage(samplefile, "col-12 alert alert-danger mt-2", "Scegliere un ruolo!", true);
+            }                
+        }
     }
 }
 </script>

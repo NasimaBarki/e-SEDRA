@@ -1,7 +1,8 @@
 'use strict'
 
+import { config } from "../../config"
 export function loginScript(updateUserCallback) {
-    var apiBaseUrl = 'http://localhost:3000'
+    var apiBaseUrl = config.$api_url
     var user = undefined
 
     function updateUserData(newUserData) {

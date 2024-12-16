@@ -20,6 +20,9 @@
  *
  */
 
+import { config } from "../../config"
+var apiBaseUrl = config.$api_url
+
 var record;
 var outPag;
 
@@ -28,6 +31,9 @@ var collapsableCreate;
 var collapsableImport;
 var myModal;
 var utable;
+
+var tr;
+var td;
 
 //const rprim = document.getElementsByName("rprim");
 var formAU = document.getElementById("AUform");
@@ -49,6 +55,96 @@ samplefile.addEventListener('change', () => {
 var ptot = document.getElementById("pagine_totali");
 var patt = document.getElementById("pagina_attuale");
 var utentiperlettera = document.getElementById("utenti_totali");
+
+function resetRuoliPrimSec() {
+    var tr = document.getElementById("TR");
+    var rp = tr.querySelectorAll('.ruoliprimari');
+    var dv;
+
+    //azzero tutti i check primari
+    //alert("sono in reset");
+    for (let j = 0; j < rp.length; j++) {
+        // alert('dentro al for');
+        let na = rp[j].getAttribute('data-lui');
+        //var ogg = recupera_na(rp[j]);
+
+        if (rp[j].checked) {
+            // alert(j + " ha il check");
+            //tolgo prima i check ai secondari
+            dv = document.getElementById("dv" + na);
+            let rss = dv.querySelectorAll(".ruolisec");
+            for (let k = 0; k < rss.length; k++) {
+                if (rss[k].checked) {
+                    rss[k].checked = '';
+                    //alert('tolto check a s '+rss[k].value);
+                }
+            }
+            rp[j].checked = ''; //prima era false
+            //alert('tolto check a p '+rp[j].value);
+            if (dv.classList.contains('show')) {
+                dv.classList.remove('show');
+                //alert('tolta classe show a '+dv);
+            }
+            // dv.hide();
+        }
+    }
+}
+
+function parseRuoli(input) {
+    const roles = {};
+    const regex = /(\w+)(?:\s\[(.+?)\])?/g;
+    let match;
+    let index = 0;
+
+    while ((match = regex.exec(input)) !== null) {
+        const idR = match[1]; // Main role
+        const idS = match[2]
+            ? match[2].split(',').map(s => s.trim())
+            : null; // Subroles, if any
+
+        roles[index] = { idR, idS };
+        index++;
+    }
+
+    return roles
+}
+
+function checkedRuoli(ut)       //passato ut['ruolo']
+{
+    resetRuoliPrimSec();
+    // console.log('In checked ruoli ' + ut);
+
+    // scompongo la stringa in un oggetto
+    ut = parseRuoli(ut)
+
+    console.log(ut)
+    var tr = document.getElementById("TR");
+    var rp = document.querySelectorAll('.ruoliprimari');
+
+    for (let i = 0; i < Object.keys(ut).length; i++) {
+        for (let j = 0; j < rp.length; j++) {
+            let na = rp[j].getAttribute('data-lui');
+            // var ogg = recupera_na(rp[j]);
+            if (rp[j].value == ut[i]['idR']) {
+                rp[j].checked = true;
+                // console.log('metto i check a ' + rp[j]);
+                let dv = document.getElementById("dv" + na);
+                dv.classList.add('show');
+
+                if (ut[i]['idS'] != null) {
+                    // console.log('checked ruoli ids ' + ut[i]['idS']);
+                    let rss = dv.querySelectorAll(".ruolisec");
+                    for (let s = 0; s < ut[i]['idS'].length; s++) {
+                        for (let k = 0; k < rss.length; k++) {
+                            if (rss[k].value == ut[i]['idS'][s])
+                                rss[k].checked = true;
+                        }
+                    }  //endfor
+                }//endif
+            }//endif
+        }
+    }
+}
 
 ready(function () {
     //alert("sono in ready");
@@ -72,7 +168,8 @@ ready(function () {
         })
     }
     var deleteOK = document.getElementById("cancelUser");
-    deleteOK.addEventListener("click", function () { call_ajax_delete_user(id_user_selezionato); topFunction(); });
+    if (deleteOK)
+        deleteOK.addEventListener("click", function () { call_ajax_delete_user(id_user_selezionato); topFunction(); });
 
     var em = document.getElementById("email");
     em.addEventListener("change", call_ajax_gestisci_mail_duplicate);
@@ -81,7 +178,6 @@ ready(function () {
     canc.addEventListener("click", function () { call_close_AUform("Aggiungi Utente"); idModUser.value = 0; });
     var canc2 = document.getElementById("annullIul");
     canc2.addEventListener("click", call_close_IULform);
-
 
     let alfall = document.querySelector(".alfa");
     alfall.addEventListener("click", (e) => {
@@ -290,7 +386,8 @@ var uploadFile = (file) => {
     wic.classList.remove('d-none');
 
     data.append('fileup', file);
-    fetch('adminsez/admin/ajax/impu.php', {
+
+    fetch(apiBaseUrl + '/impu', {
         method: "POST",
         //headers: {
         //    'Content-Type': 'application/json'
@@ -299,6 +396,7 @@ var uploadFile = (file) => {
     }).then(function (risp) {
         return risp.json();
     }).then(function (rispdata) {
+
         samplefile.value = '';
         let wic = document.getElementById("spinner-div");
         wic.classList.add('d-none');
@@ -406,14 +504,15 @@ function call_ajax_refresh_table_user(param, pagCorr) {
         usedefault = true;
     }
 
-    var datai = new FormData;
-    datai.append("search", param);
-    fetch('adminsez/admin/ajax/getusers.php', {
+    var datai = {}
+    // datai.append("search", param);
+    datai.search = param
+    fetch(apiBaseUrl + '/getusers', {
         method: 'POST',
-        //headers: {
-        //    'Content-Type': 'application/x-www-form-urlencoded'
-        //},
-        body: datai
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(datai)
     })
         .then(
             function (response) {
@@ -505,6 +604,41 @@ function aggiornaPaginanew(/*porz*/) {
     utable.appendChild(tb);
 }
 
+function serializeRuoli() {
+    var ruol = [];
+    //var ind = 0;
+    var tr = document.getElementById("TR");
+    var rp = tr.querySelectorAll('.ruoliprimari');
+    //console.log('TR e rp ' + tr + ' ' + rp);
+    for (let j = 0; j < rp.length; j++) {
+        let na = rp[j].getAttribute('data-lui');
+        if (rp[j].checked) {
+            let dv = document?.getElementById("dv" + na);
+            let rss = null
+            if (dv)
+                rss = dv?.querySelectorAll(".ruolisec");
+            let cont = 0;
+
+            for (let k = 0; k < (rss ? rss.length : 0); k++) {
+                if (rss[k].checked)
+                    cont++;
+            }
+            if (cont == 0)
+                ruol.push(rp[j].value, '0');
+            else {
+                for (let k = 0; k < rss.length; k++) {
+                    if (rss[k].checked)
+                        ruol.push(rp[j].value, rss[k].value);
+                }
+            }
+        }
+        /*   }*/
+    }
+    // alert(ruol);
+    // console.log("ruoli: " + ruol);
+    return ruol;
+}
+
 async function call_ajax_create_user() {
     var elem;
     var ruoli = serializeRuoli();
@@ -519,7 +653,7 @@ async function call_ajax_create_user() {
         var data = new FormData(formAU);
         data.append('ruoli', JSON.stringify(ruoli));
         /* console.log(data);*/
-        let promo = fetch('adminsez/admin/ajax/addu.php', {
+        let promo = fetch(apiBaseUrl + '/addu', {
             method: 'POST',
             body: data
         }).then(successResponse => {
@@ -536,11 +670,11 @@ async function call_ajax_create_user() {
         );
         //console.log('aspetto che la promessa risolva');
         let risp = await promo;
-        //console.log('OK..promessa risolta ' + risp);
-        //alert(risp);
+        // console.log('OK..promessa risolta ' + risp);
+        // alert(JSON.stringify(risp));
         if (risp.errors) {
             var l = risp.errors.length;
-            for (i = 0; i < l; i++) {
+            for (let i = 0; i < l; i++) {
                 elem = document.getElementById(risp.errors[i].param);
                 divMessage(elem, "alert alert-danger mt-2", risp.errors[i].msg, false);
             }
@@ -575,14 +709,20 @@ function call_ajax_edit_user(id, readonly, showpd) {
     if (readonly) {
         ro = 1;       //usata per la view
     }
-    var data = new FormData;
-    data.append('user_id', id);
-    data.append('pw', mostrapassword);
-    data.append('view', ro);
+    var data = {};
+    // data.append('user_id', id);
+    // data.append('pw', mostrapassword);
+    // data.append('view', ro);
+    data.user_id = id
+    data.pw = mostrapassword
+    data.view = ro
 
-    fetch('adminsez/admin/ajax/edituser.php', {
+    fetch(apiBaseUrl + '/edituser', {
         method: 'POST',
-        body: data
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
     })
         .then(
             function (response) {
@@ -621,12 +761,11 @@ function vediUtente(ut, readonly) {
     idModUser.value = ut['idUs'];
     document.getElementById("nome").value = ut['nome'];
     document.getElementById("cognome").value = ut['cognome'];
-    document.getElementById("email").value = ut['email'];
+    document.getElementById("e-mail").value = ut['email'];
     document.getElementById("cell").value = ut['cell'];
     document.getElementById("cod").value = ut['cod'];
-    document.getElementById("dtPsw").value = ut['dtPsw'];
+    document.getElementById("dtPsw").value = ut['dtPsw'].slice(0, 16);
     if (ut['dtScPsw'] != 0) {
-        //console.log('giorni: '+ut['ggscPsw']);
         document.getElementById("dtscPsw").value = ut['ggscPsw'];   //vedo i giorni mancanti se calcolati
         document.getElementById("dtscPsw").style.visibility = "visible";
     }
@@ -656,7 +795,7 @@ async function call_ajax_delete_user(idcanc) {
 
     var data = new FormData;
     data.append("user_id", idcanc);
-    let promo = fetch('adminsez/admin/ajax/deleteuser.php', {
+    let promo = fetch(apiBaseUrl + '/deleteUser', {
         method: 'POST',
         body: data
     }).then(successResponse => {

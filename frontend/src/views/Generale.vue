@@ -93,8 +93,9 @@
 
             <template v-for="row in result">
                 <option v-if="row.R"class='optionGroup' v-bind:value="row.idR">{{row.R}}</option>
-                <!-- {{ updateRuolo(row.idR) }} -->
-                <option v-if="row.S" class='optionChild' v-bind:value="row.idS">{{row.S}}</option>
+                <template v-for="subrow in row.sub">
+                    <option v-if="subrow.S" class='optionChild' v-bind:value="subrow.idS">{{subrow.S}}</option>
+                </template>
             </template>
             <!-- <?php
             $ruolo = 1;
@@ -165,19 +166,24 @@
 
 <script>
 import axios from 'axios'
+import { generaleScript } from '../js/confgenscript'
 export default {
     data() {
         return {
             config: {},
             roles: undefined,
-            result: {},
+            result: undefined,
             resultSize: undefined,
             ruolo: undefined,
             updatedResult: undefined
         }
     },
     mounted() {
-        import('../js/confgenscript')
+        document.onreadystatechange = () => {
+        if (document.readyState == "complete") {
+            console.log('confgenscript.js caricato')
+            generaleScript(this.updateResult)
+        }}
 
         this.getConfigData()
         this.getRuoli()
@@ -193,32 +199,29 @@ export default {
         async getRuoli() {
             let res = await axios.get(this.apiBaseUrl + '/getRuoliAll')
             this.roles = JSON.parse(res.data)
-            console.log('ALL RUOLI:\n', this.roles)
+            // console.log('ALL RUOLI:\n', this.roles)
         },
         async getRuoliTree() {
             let res = await axios.get(this.apiBaseUrl + '/getRuoliTree')
             // this.result = JSON.parse(res.data)
             // this.resultSize = Object.keys(this.result).length
-            console.log(JSON.parse(res.data))
+            // console.log(JSON.parse(res.data))
 
             let vett = []
             let sub = []
             let i = 0
             let j = 0
+            let roleCount = 0
             for(const [key, value] of Object.entries(JSON.parse(res.data))) {
-                console.log('Value: ', value)
-
                 let idR = value['idR']
                 let R = value['R']
 
                 if(this.ruolo != idR) {
                     this.ruolo = idR
-                    vett[j] = {'idR': idR, 'R': R, 'Sub': null}
-                    console.log('vett: ', vett[j])
+                    vett[j] = {'idR': idR, 'R': R, 'sub': null}
+                    
                     if(sub.length > 0) {
-                        console.log('sb: ', sub)
-                        vett[j-1].Sub = sub
-                        console.log(vett[j])
+                        vett[j-1].sub = sub
                         sub = []
                     }
                     i = 0 
@@ -228,39 +231,33 @@ export default {
                         let idS = value['idS']
                         let S = value['S']
                         sub[i] = {'idS': idS, 'S': S}
-                        console.log('sub: ', sub[i])
                         i++
-                        // console.log('value S', value['S'])
+                        roleCount++
                 }
             }
+            vett[j-1].sub = sub
+            roleCount++
 
-            console.log('VETT\n', vett)
-            // for(const [key, value] of Object.entries(JSON.parse(res.data))) {
-            //     if(this.ruolo != value.idR) {
-            //         this.ruolo = value.idR
-
-            //         let idR = value['idR']
-            //         let R = value['R']
-            //         // console.log(idR + R)
-
-            //         this.result[' ' + idR] = {'R': R}
-            //     }
-            //     if(value['S']) {
-            //         // console.log(value['S'])
-
-            //         let idS = value['idS']
-            //         let S = value['S']
-
-            //         this.result[' ' + idS] = {'S' : S}
-            //     }
-            // }
-            // console.log('RUOLI TREE:\n', this.result)
+            // console.log('VETT\n', vett)
+            this.result = vett
+            console.log('Result: ', this.result)
+            this.resultSize = roleCount
         },
         updateRuolo(nuovoRuolo) {
             this.ruolo = nuovoRuolo
         },
         postConfig(url, newData) {
             axios.post(this.apiBaseUrl + '/config/' + url, {data: newData})
+        },
+        updateResult(newResult) {
+            this.roles = []
+            for(const [key, value] of Object.entries(JSON.parse(newResult))) {
+                this.roles.push(value)
+            }
+
+            this.getRuoliTree()
+            console.log(this.roles)
+            // TODO: modificare la lunghezza
         }
     }
 }

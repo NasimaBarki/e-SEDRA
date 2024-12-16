@@ -20,7 +20,7 @@
                         <li class="page-item">
                             <a class="page-link disable" tabindex="-1">
                                 Accessi: <span id="utenti_totali">
-                                    <!-- <?php echo $tot;?> -->
+                                    {{tot}}
                                 </span>
                             </a>
                         </li>
@@ -33,13 +33,14 @@
                 </nav>
             </div>
         <div class="col-4"></div>
-        <form method='POST' class="row g-3 text-end col-5" action='adminsez/admin/writelogs.php'>
+<!-- TODO:                                              action='adminsez/admin/writelogs.php' -->
+        <form method='POST' class="row g-3 text-end col-5">
             <!--<input type='submit' value='Export' name='Export' />-->
             <div class="col-md-6">
-                <input type="submit" class="btn btn-primary" value="Esporta registrazioni" />
+                <input @click="callWriteLogs" class="btn btn-primary" value="Esporta registrazioni" />
             </div>
             <div class="col-md-6">
-                <button class="btn btn-primary" id="delLog">Elimina registrazioni</button>
+                <input @click="callDeleteLogs" class="btn btn-primary" id="delLog" value="Elimina registrazioni">
             </div>
         </form>
 </div>
@@ -66,9 +67,67 @@
                             echo "<tr><td>" . $row["cognome"] . " " . $row["nome"] . "</td><td>" . $row["ruolo"] . "</td><td>" . $row["email"] . "</td><td>". $row["dtS"] . "</td><td>" . $dfi . "</td></tr>";
                         }
                         ?> -->
+                        <template v-for="accesso in accessi">
+                            <tr>
+                                <td>{{ accesso.cognome }} {{ accesso.nome }}</td>
+                                <td>{{ accesso.ruolo }}</td>
+                                <td>{{ accesso.email }}</td>
+                                <td>{{ accesso.dtS }}</td>
+                                <td v-if="accesso.dtE">{{ accesso.dtE }}</td>
+                                <td v-else>...</td>
+                            </tr>
+                        </template>
                     </tbody>
                 </table>
         </div>
        
 </section>
 </template>
+
+<script>
+import axios from 'axios'
+
+import { config } from '../../config'
+
+export default {
+    data() {
+        return {
+            tot: 0,
+            accessi: undefined
+        }
+    },
+    mounted()
+    {
+        this.fetchLogs()
+    },
+    methods:
+    {
+        async fetchLogs() {
+            let res = await axios.get(this.apiBaseUrl + '/getLogData')
+            this.tot = Object.keys(res.data).length
+            this.accessi = res.data
+            
+            return this.apiBaseUrl
+        },
+        callWriteLogs() {
+
+            axios.get(this.apiBaseUrl + '/writelogs')
+            .then(
+                response => {
+                    let blob = new Blob([response.data], { type: 'application/pdf' })
+                    let link = document.createElement('a')
+                    link.href = window.URL.createObjectURL(blob)
+
+                    let filename = response.headers['content-disposition'].split('filename=')[1].split(';')[0]
+                    link.download = filename.substring(1, filename.length-1)
+                    link.click()
+                }
+            )
+        },
+        async callDeleteLogs() {
+            let res = await axios.post(this.apiBaseUrl + '/deletelogs')
+            window.location.reload()
+        }
+    }
+}
+</script>

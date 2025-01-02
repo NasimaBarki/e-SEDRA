@@ -35,7 +35,7 @@ import Login from './Login.vue'
                 <!-- TODO: <?php
                 if(array_key_exists(1, $_SESSION['user']['roles'])) { //utente è amministratore
                 ?> -->
-                <li class="dropdown">
+                <li v-if="admin" class="dropdown">
                     <a href="javascript:void(0);" class="no_link text-decoration-none">
                         <span>Configurazione</span><i class="bi bi-chevron-down"></i>
                     </a>
@@ -45,7 +45,8 @@ import Login from './Login.vue'
                             <router-link to='/generale' text-decoration-none>Generale</router-link>
                         </li>
                         <li>
-                            <a class="<?php if($mact == 4) echo 'active'; ?> text-decoration-none" href="adminsez/admin/admconfact.php" id="4">Attivit&agrave;</a>
+                            <!-- <a class="<?php if($mact == 4) echo 'active'; ?> text-decoration-none" href="adminsez/admin/admconfact.php" id="4">Attivit&agrave;</a> -->
+                            <router-link to='/attivita' text-decoration-none>Attività</router-link>
                         </li>
                         <li>
                             <router-link to='/ambiti' text-decoration-none>Ambiti</router-link>
@@ -110,10 +111,16 @@ export default {
 
     data() {
         return {
-            modal: false
+            modal: false,
+            admin: false
         }
     },
     mounted() {
+        if(this.user != null && this.user.ruolo.includes('Amministratore'))
+            this.admin = true
+        else
+            this.admin = false
+
         document.onreadystatechange = () => {
         if (document.readyState == "complete") {
             console.log('menu.js e login.js caricati')

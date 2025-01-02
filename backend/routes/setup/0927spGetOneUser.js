@@ -105,7 +105,7 @@ router.post('/edituser', async (req, res) => {
         }
     } catch (error) {
         console.log(error)
-        res.status(500).send('Errore query getLogData')
+        res.status(500).send('Errore query getOneUser')
     }
 })
 

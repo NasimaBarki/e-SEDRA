@@ -245,7 +245,7 @@ export default {
             alf: 'abcdefghijklmnopqrstuvwxyz'.split(''),
             search: 'a%',
             editU: 0,
-            title: 'Ruoli utente (* &egrave; richiesto almeno UN ruolo primario)',
+            title: 'Ruoli utente (* è richiesto almeno UN ruolo primario)',
             ruoli: [],
             bottonePrimarioChecked: false,
             dtNow: new Date().toISOString().slice(0, 16)  

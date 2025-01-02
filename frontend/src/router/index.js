@@ -7,6 +7,7 @@ import Profilo from '../views/Profilo.vue'
 import Utenti from '../views/Utenti.vue'
 import Logfile from '../views/Logfile.vue'
 import Generale from '../views/Generale.vue'
+import Attivita from '@/views/Attivita.vue'
 
 const routes = [
     {
@@ -43,6 +44,11 @@ const routes = [
         path: '/generale',
         name: 'generale',
         component: Generale
+    },
+    {
+        path: '/attivita',
+        name: 'attivita',
+        component: Attivita
     }
 ]
 

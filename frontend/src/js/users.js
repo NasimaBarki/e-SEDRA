@@ -67,7 +67,6 @@ function resetRuoliPrimSec() {
         // alert('dentro al for');
         let na = rp[j].getAttribute('data-lui');
         //var ogg = recupera_na(rp[j]);
-
         if (rp[j].checked) {
             // alert(j + " ha il check");
             //tolgo prima i check ai secondari
@@ -113,7 +112,6 @@ function checkedRuoli(ut)       //passato ut['ruolo']
 {
     resetRuoliPrimSec();
     // console.log('In checked ruoli ' + ut);
-
     // scompongo la stringa in un oggetto
     ut = parseRuoli(ut)
 
@@ -125,7 +123,10 @@ function checkedRuoli(ut)       //passato ut['ruolo']
         for (let j = 0; j < rp.length; j++) {
             let na = rp[j].getAttribute('data-lui');
             // var ogg = recupera_na(rp[j]);
-            if (rp[j].value == ut[i]['idR']) {
+            // console.log(rp[j].getAttribute('data-nomeRuolo'))
+            // console.log('ruolo: ', ut[i])
+
+            if (rp[j].getAttribute('data-nomeRuolo') == ut[i]['idR']) {
                 rp[j].checked = true;
                 // console.log('metto i check a ' + rp[j]);
                 let dv = document.getElementById("dv" + na);
@@ -136,7 +137,7 @@ function checkedRuoli(ut)       //passato ut['ruolo']
                     let rss = dv.querySelectorAll(".ruolisec");
                     for (let s = 0; s < ut[i]['idS'].length; s++) {
                         for (let k = 0; k < rss.length; k++) {
-                            if (rss[k].value == ut[i]['idS'][s])
+                            if (rss[k].getAttribute('data-nomeRuolo') == ut[i]['idS'][s])
                                 rss[k].checked = true;
                         }
                     }  //endfor
@@ -623,6 +624,7 @@ function serializeRuoli() {
                 if (rss[k].checked)
                     cont++;
             }
+
             if (cont == 0)
                 ruol.push(rp[j].value, '0');
             else {
@@ -652,7 +654,7 @@ async function call_ajax_create_user() {
         /*  formAU.classList.remove("alert");*/
         var data = new FormData(formAU);
         data.append('ruoli', JSON.stringify(ruoli));
-        /* console.log(data);*/
+        // console.log('data: ', data);
         let promo = fetch(apiBaseUrl + '/addu', {
             method: 'POST',
             body: data
@@ -736,7 +738,6 @@ function call_ajax_edit_user(id, readonly, showpd) {
                     //console.log(risp);
                     //trasformo ilJSON in oggetto JS
                     var ut = JSON.parse(risp);
-                    //console.log('UT=' + ut);
                     //mettere i dati nel form
                     vediUtente(ut, readonly);
                     //cambio la label al bottone
@@ -774,6 +775,7 @@ function vediUtente(ut, readonly) {
 
     //resetRuoliPrimSec();
     //check ruoli primari e secondari
+    console.log(ut)
     checkedRuoli(ut['ruolo']);
     if (ut['idUs'] == 1) {
         document.getElementById("nome").setAttribute('disabled', true);

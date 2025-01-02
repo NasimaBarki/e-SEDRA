@@ -58,7 +58,7 @@ async function set_User(vid, dcsv, psw = null) {
 
         if (vid == 0) {
             up = false;
-            let pswTemp = (dcsv['nome'][0] + dcsv['cognome'][0]).toLowerCase();
+            let pswTemp = (dcsv['nome'] + dcsv['cognome']).toLowerCase();
             psw = await bcrypt.hash(pswTemp, 10)
         }
 
@@ -327,12 +327,12 @@ async function delete_ruoli_utente(utente) {
     }
     try {
         await sequelize.query(query, {
-            ...type && { replacements: { how: user } },
+            ...type && { replacements: { how: utente } },
             ...type && { type: sequelize.QueryTypes.DELETE }
         })
     } catch (error) {
         console.log(error)
-        res.status(500).send('Errore query delRolesUser')
+        // res.status(500).send('Errore query delRolesUser')
     }
 
 }
@@ -371,7 +371,7 @@ router.post('/addu', async (req, res) => {
             errors.push({ param: 'e-mail', msg: 'Formato non valido per il e-email' })
     }
 
-    if (await dupMail(email))
+    if (datu['user_id'] == 0 && await dupMail(email))
         errors.push({ param: 'e-mail', msg: 'L\'email è già stata usata da un altro utente' })
 
     if (datu['cell'] != '' && !/3\d{2}[\. ]??\d{6,7}$/.test(datu['cell']))
@@ -382,15 +382,14 @@ router.post('/addu', async (req, res) => {
     else {
         let id = null
         if (datu['user_id'] != 0) {
-            id = set_User(datu['user_id'], datu, null)
+            id = await set_User(datu['user_id'], datu, null)
 
             await delete_ruoli_utente(id)
             let ruoli = JSON.parse(datu['ruoli'])
 
-            for (let i = 0; i < ruoli.length; i += 2)
-                set_ruolo_utente(id, ruoli[i], ruoli[i + 1])
-
-            // TODO: non so come aggiornare l'utente
+            for (let i = 0; i < ruoli.length; i += 2) {
+                await set_ruolo_utente(id, ruoli[i], ruoli[i + 1])
+            }
 
             succ.push('Aggiornato utente ID= ' + id)
         } else {

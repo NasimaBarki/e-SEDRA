@@ -16,7 +16,7 @@
             <template v-for="ruolo in ruoli">
                 <div v-if="ruolo['primario'] == 1" class="form-check">                                                                    
                     <!--                                                                                                                                                                                                                                                <?php echo (($role['chk'])?'checked':'')?> -->
-                    <input type="checkbox" class="form-check-input ruoliprimari" data-bs-toggle="collapse" v-bind:data-bs-target="'#dv_' + ruolo['idRl']" v-bind:data-lui="'_' + ruolo['idRl']" v-bind:name="'rp_' + ruolo['idRl']" v-bind:id="'rp_' + ruolo['idRl']" v-bind:value="ruolo['ruolo']" :checked="ruolo.chk ? true : false"/>
+                    <input v-bind:data-nomeRuolo="ruolo['ruolo']" type="checkbox" class="form-check-input ruoliprimari" data-bs-toggle="collapse" v-bind:data-bs-target="'#dv_' + ruolo['idRl']" v-bind:data-lui="'_' + ruolo['idRl']" v-bind:name="'rp_' + ruolo['idRl']" v-bind:id="'rp_' + ruolo['idRl']" v-bind:value="ruolo['idRl']" :checked="ruolo.chk ? true : false"/>
                     <label class="form-check-label" v-bind:for="'rp_' + ruolo['idRl']">
                         {{ ruolo['ruolo'] }}
                     </label>
@@ -25,7 +25,7 @@
                 <div class="collapse container col-md-9 mb-3 " v-bind:id="'dv_' + ruolo['idRl']" v-bind:name="'dv_' + ruolo['idRl']">
                                 <div v-for="sub in ruolo['sub']" class="form-check form-check-inline">                                    
                                     <!--                                                                                                                                                                         <?php if(isset($s['chk'])) echo (($s['chk'])?' checked':'')?> -->
-                                    <input type="checkbox" class="form-check-input ruolisec" v-bind:id="'rsec_' + ruolo['idRl'] + '_' + sub['idS']" v-bind:name="'rsec_' + ruolo['idRl'] + '_' + sub['idS']" v-bind:value="sub['S']" :checked="sub.chk ? true : false"/>
+                                    <input v-bind:data-nomeRuolo="sub['S']" type="checkbox" class="form-check-input ruolisec" v-bind:id="'rsec_' + ruolo['idRl'] + '_' + sub['idS']" v-bind:name="'rsec_' + ruolo['idRl'] + '_' + sub['idS']" v-bind:value="sub['idS']" :checked="sub.chk ? true : false"/>
                                     <label class="form-check-label" v-bind:for="'rsec_' + ruolo['idRl'] + '_' + sub['idS']">
                                         {{ sub['S'] }}
                                     </label>

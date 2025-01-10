@@ -240,7 +240,7 @@ export default {
 
             // console.log('VETT\n', vett)
             this.result = vett
-            console.log('Result: ', this.result)
+            // console.log('Result: ', this.result)
             this.resultSize = roleCount
         },
         updateRuolo(nuovoRuolo) {
@@ -256,7 +256,7 @@ export default {
             }
 
             this.getRuoliTree()
-            console.log(this.roles)
+            // console.log(this.roles)
             // TODO: modificare la lunghezza
         }
     }

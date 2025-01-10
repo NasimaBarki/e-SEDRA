@@ -51,7 +51,7 @@ function rolesToString(users, key) {
             // generazione della stringa contenente ruoli e sottoruoli
             let ruoloStringa = ''
             for (let item in obj) {
-                ruoloStringa += ' ' + item
+                ruoloStringa += ' - ' + item
 
                 if (obj[item])
                     ruoloStringa += ' [' + obj[item] + ']'
@@ -86,20 +86,45 @@ function rolesToString(users, key) {
 
     let ruoloStringa = ''
     for (let item in obj) {
-        ruoloStringa += ' ' + item
+        ruoloStringa += ' - ' + item
 
         if (obj[item])
             ruoloStringa += ' [' + obj[item] + ']'
     }
 
     if (i >= 0) {
-        rows[i].ruolo = ruoloStringa.trimStart()
+        rows[i].ruolo = ruoloStringa
         // console.log('Stringa: ', ruoloStringa)
 
-        // console.log('Ruolo modificato: ', rows[i])
+        rows[i].ruolo = rows[i].ruolo.slice(3, rows[i].ruolo.length)
     }
 
     return rows
 }
+
+// function processUserRolesString(users, campokey) {
+//     console.log('utenti: ', users)
+
+//     let prou = []
+//     for (let u in users) {
+//         // console.log('u: ', users[0])
+//         let pu = users[0]
+//         pu[campokey] = u
+//         delete pu.ruolo
+//         delete pu.subruolo
+//         pu.ruolo = processRolesToString(users[u])
+
+//         prou.push(pu)
+//     }
+//     console.log('prou: ', prou)
+//     return prou
+// }
+
+// function processRolesToString(u) {
+//     if (u.subruolo != '')
+//         return u.ruolo + ' [' + u.subruolo + ']'
+//     else
+//         return u.ruolo
+// }
 
 module.exports = { rolesToString }

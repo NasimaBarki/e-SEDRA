@@ -44,6 +44,11 @@ var spDelRolesUserRouter = require('./routes/setup/0929spDelRolesUser')
 var attivitaRouter = require('./routes/setup/0006attivita')
 var spGetRolesActivityRouter = require('./routes/setup/0934spGetRolesActivity')
 var attRuoliRouter = require('./routes/setup/0007attRuoli')
+var numberOfStarsRouter = require('./routes/setup/0030numberOfStars')
+var spGetMomentRouter = require('./routes/setup/0913spGetMoment')
+var bisogniRouter = require('./routes/setup/0010bisogni.js')
+var spSetUpdBisogniRouter = require('./routes/setup/0930spSetUpdBisogni.js')
+var spDelBisogniRouter = require('./routes/setup/0931spDelBisogni.js')
 
 // crea app express
 const app = express()
@@ -95,6 +100,11 @@ app.use('/', spGetDupMailRouter)
 app.use('/', spDelRolesUserRouter)
 app.use('/', spGetRolesActivityRouter)
 app.use('/', attRuoliRouter)
+app.use('/', numberOfStarsRouter)
+app.use('/', spGetMomentRouter)
+app.use('/', bisogniRouter)
+app.use('/', spSetUpdBisogniRouter)
+app.use('/', spDelBisogniRouter)
 
 // attivazione server
 app.listen(config.port, () => {

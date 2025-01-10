@@ -27,7 +27,8 @@ import Login from './Login.vue'
                     <!-- <a class="<?php if($mact == 0) echo 'active'; ?> text-decoration-none" href="pages/home.php" id="0">Home</a> -->
                 </li>
                 <li>
-                    <a class="<?php if($mact == 1) echo 'active'; ?> text-decoration-none" href="pages/bisognibase.php" id="1">Bisogni</a>
+                    <!-- <a class="<?php if($mact == 1) echo 'active'; ?> text-decoration-none" href="pages/bisognibase.php" id="1">Bisogni</a> -->
+                    <router-link to='/bisognibase' text-decoration-none>Bisogni</router-link>
                 </li>
                 <li>
                     <a class="<?php if($mact == 2) echo 'active'; ?> text-decoration-none" href="pages/propostebase.php" id="2">Proposte</a>

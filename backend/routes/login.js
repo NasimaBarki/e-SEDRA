@@ -87,6 +87,45 @@ router.post('/login', async (req, res) => {
                     results1.push(results[1][i])
                 }
 
+                // console.log('results1: ', results1)
+
+                let userProva = null;
+
+                if (results1.length >= 1) {
+                    // Assign the first result to userProva
+                    userProva = { ...results1[0] };
+
+                    // Remove unnecessary properties
+                    delete userProva.psw;
+                    delete userProva.ruolo;
+                    delete userProva.ruoloNU;
+                    delete userProva.subruolo;
+                    delete userProva.subruoloNU;
+
+                    // Initialize the roles object
+                    userProva.roles = {};
+
+                    // Iterate through results1 to populate roles
+                    for (const r of results1) {
+                        // Ensure the roleNU key exists in roles
+                        if (!userProva.roles[r.ruoloNU]) {
+                            userProva.roles[r.ruoloNU] = {};
+                        }
+
+                        // Set the role's name
+                        userProva.roles[r.ruoloNU].nome = r.ruolo;
+
+                        // If a sub-role exists, add it under the corresponding role
+                        if (r.subruoloNU != null) {
+                            userProva.roles[r.ruoloNU][r.subruoloNU] = r.subruolo;
+                        }
+                    }
+
+                    // Log the final userProva object
+                    // console.log(userProva);
+                }
+
+
                 user = roles.rolesToString(results1, 'idUs')
                 user = user[0]
 
@@ -100,46 +139,9 @@ router.post('/login', async (req, res) => {
                 user.ggScPsw = results0[0].ggScPsw
 
                 user["R"] = 'K'
-                // fa tutto la funzione, quindi non serve
-                // let rows = results1.map(item => item)
-
-                // let results0 = [results[0]['0']]
-
-                // // console.log('Results0: ', results0)
-                // // console.log('Results1: ', results1)
-
-                // if (rows.length >= 1) {
-                //     user = Object.assign({}, rows[0])
-
-                //     user.dtStart = results0[0].dtStart
-                //     user.ggScPsw = results0[0].ggScPsw
-
-                //     delete user.psw
-                //     delete user.ruolo
-                //     delete user.ruoloNU
-                //     delete user.subruolo
-                //     delete user.subruoloNU
-                //     user.roles = {}
-
-                //     rows.forEach(row => {
-
-                //         if (row.ruolo) {
-                //             user.roles[row.ruoloNU] = [row.ruolo]
-                //         }
-
-                //         if (row.subruolo) {
-                //             let key = JSON.stringify(row.subruoloNU)
-                //             var obj = {}
-
-                //             obj[key] = row.subruolo
-
-                //             user.roles[row.ruoloNU].push(JSON.stringify(obj))
-                //         }
-                //     })
-
-                // user["R"] = 'K'
+                user.roles = userProva.roles
             }
-            console.log('user: ', user)
+            // console.log('user: ', user)
             res.send(user)
         }
 

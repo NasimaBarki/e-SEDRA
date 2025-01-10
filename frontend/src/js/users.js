@@ -91,20 +91,37 @@ function resetRuoliPrimSec() {
 
 function parseRuoli(input) {
     const roles = {};
-    const regex = /(\w+)(?:\s\[(.+?)\])?/g;
-    let match;
-    let index = 0;
+    // const regex = /(\w+)(?:\s\[(.+?)\])?/g;
+    // let match;
+    // let index = 0;
 
-    while ((match = regex.exec(input)) !== null) {
-        const idR = match[1]; // Main role
-        const idS = match[2]
-            ? match[2].split(',').map(s => s.trim())
-            : null; // Subroles, if any
+    let prova = input.split(' - ')
+    // console.log('input: ', prova)
 
-        roles[index] = { idR, idS };
-        index++;
+    for (let ruolo in prova) {
+        let item = {}
+        item.idR = prova[ruolo]
+        let sottoruoli = null
+        if (prova[ruolo].includes('[')) {
+            item.idR = prova[ruolo].slice(0, prova[ruolo].indexOf('[') - 1)
+            sottoruoli = prova[ruolo].slice(prova[ruolo].indexOf('[') + 1, prova[ruolo].length - 1)
+            sottoruoli = sottoruoli.split(', ')
+        }
+        item.idS = sottoruoli
+        roles[ruolo] = item
     }
 
+    // while ((match = regex.exec(input)) !== null) {
+    //     const idR = match[1]; // Main role
+    //     const idS = match[2]
+    //         ? match[2].split(',').map(s => s.trim())
+    //         : null; // Subroles, if any
+
+    //     roles[index] = { idR, idS };
+    //     index++;
+    // }
+
+    // console.log('roles: ', roles)
     return roles
 }
 
@@ -115,8 +132,7 @@ function checkedRuoli(ut)       //passato ut['ruolo']
     // scompongo la stringa in un oggetto
     ut = parseRuoli(ut)
 
-    console.log(ut)
-    var tr = document.getElementById("TR");
+    // console.log(ut)
     var rp = document.querySelectorAll('.ruoliprimari');
 
     for (let i = 0; i < Object.keys(ut).length; i++) {
@@ -735,7 +751,7 @@ function call_ajax_edit_user(id, readonly, showpd) {
                 }
                 // Examine the text in the response
                 response.text().then(function (risp) {
-                    //console.log(risp);
+                    // console.log(risp);
                     //trasformo ilJSON in oggetto JS
                     var ut = JSON.parse(risp);
                     //mettere i dati nel form
@@ -775,7 +791,7 @@ function vediUtente(ut, readonly) {
 
     //resetRuoliPrimSec();
     //check ruoli primari e secondari
-    console.log(ut)
+    // console.log(ut)
     checkedRuoli(ut['ruolo']);
     if (ut['idUs'] == 1) {
         document.getElementById("nome").setAttribute('disabled', true);

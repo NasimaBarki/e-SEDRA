@@ -97,7 +97,7 @@ router.post('/edituser', async (req, res) => {
             delete user[0].ruoloNU
             delete user[0].subruoloNU
 
-            // console.log(user[0])
+            console.log('user: ', user[0])
 
             res.json(user[0])
         } else {

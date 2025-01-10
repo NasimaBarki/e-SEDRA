@@ -187,21 +187,21 @@ function serializeRuoli() {
         }
         /*   }*/
     }
-    alert(ruol);
+    // alert(ruol);
     // console.log("ruoli: " + ruol);
     return ruol;
 }
 
 function checkedRuoli(ut)       //passato ut['ruolo']
 {
-    console.log('ut: ', ut)
-    console.log(Object.keys(ut).length)
+    // console.log('ut: ', ut)
+    // console.log(Object.keys(ut).length)
     resetRuoliPrimSec();
     //console.log('In checked ruoli ' + ut);
     var tr = document.getElementById("TR");
     var rp = document.querySelectorAll('.ruoliprimari');
     for (let i = 0; i < Object.keys(ut).length; i++) {
-        console.log(ut[i]);  // Ensure that you don't try to access ut[i] when it's undefined.
+        // console.log(ut[i]);  // Ensure that you don't try to access ut[i] when it's undefined.
         if (ut[i] && ut[i]['ruolo']) { // Check if ut[i] exists before accessing 'ruolo'
             for (let j = 0; j < rp.length; j++) {
                 let na = rp[j].getAttribute('data-lui');
@@ -233,7 +233,7 @@ function getButtonLabel(me) {
     //var me = document.getElementById("mainDiv");
     var tuttifigli = me.parentNode.childNodes;
     var mieifratelli = [];
-    for (i = 0; i < tuttifigli.length; i++) {
+    for (let i = 0; i < tuttifigli.length; i++) {
         if (tuttifigli[i] !== me) {
             //console.log(tuttifigli[i]);
             if (tuttifigli[i].nodeName == "LABEL")
@@ -243,6 +243,7 @@ function getButtonLabel(me) {
     //console.log("label " + mieifratelli[0].innerHTML);
     return (mieifratelli[0]);
 }
+
 ready(function () {
 
     var mm = document.getElementById('myModalAttention');
@@ -337,6 +338,10 @@ ready(function () {
         }
         else {
             e.preventDefault()
+            if (document.getElementById('collapseAct').classList.contains('show')) {
+                document.getElementById('collapseAct').classList.remove('show')
+                document.getElementById('collapseAct').classList.add('hide')
+            }
             call_ajax_save_act(act, ruoliAuto);
         }
     });
@@ -443,6 +448,16 @@ function gestiscistelle(act) {
     readStelleFromDb(act);
 }
 
+function checkedstelle(star, campo) {
+    /* console.log(star);*/
+    for (let j in star) {
+        /* console.log("j " + j);*/
+        var ind = 'val' + star[j]['idstar'];
+        /* console.log('ind '+ind);*/
+        document.getElementById(ind).value = star[j][campo];
+    }
+}
+
 async function readStelleFromDb(act) {
     var data = new FormData;
     var campo;
@@ -450,7 +465,7 @@ async function readStelleFromDb(act) {
     if (act == 204) { campo = "vpro"; };
     data.append("campo", campo);
     /*  let tuttepromesse = [];*/
-    let promo1 = await fetch('adminsez/admin/ajax/getstelle.php', {
+    let promo1 = await fetch(apiBaseUrl + '/getstelle', {
         method: 'POST',
         body: data
     }).then(successResponse => {
@@ -472,7 +487,6 @@ async function readStelleFromDb(act) {
 
     //console.log('OK.. ' + result);
     if (result) {
-
         checkedstelle(result, campo);
     }
 }
@@ -542,11 +556,12 @@ async function call_ajax_edit_act(act) {
 
         }
         //else
+        console.log('results: ', results[0])
         showActivity(results[0], retroDate);
         //console.log('results ' + results[0]['nome']);        
     }
-    console.log('r1 ' + JSON.stringify(results[1]));
-    console.log(results[1][0])
+    // console.log('r1 ' + JSON.stringify(results[1]));
+    // console.log(results[1][0])
     if (results[1])
         checkedRuoli(results[1]);
     else
@@ -641,12 +656,13 @@ function defineDateStartStop(act, retroDate) {
     //var offset = new Date().getTimezoneOffset();
     //oggi.setMinutes(oggi.getMinutes() - offset);
     //var oggiS = now();
-    console.log(act + ' ' + retroDate);
+    // console.log(act + ' ' + retroDate);
     const di = document.getElementById("dtStart");
     const df = document.getElementById("dtStop");
     if (di.disabled) {
         di.removeAttribute('disabled');
     }
+    console.log(act)
     di.value = act['dtStart'];
 
     //console.log("act ", act['dtStart']);
@@ -662,6 +678,7 @@ function defineDateStartStop(act, retroDate) {
         let idp = act['dipendeda'];
         if (idp != null) {
             //console.log("dipende da "+idp);
+            console.log(document.getElementById("hTo" + idp))
             let dip = document.getElementById("hTo" + idp).getAttribute("value");
             //console.log("dipende value " + dip);
             //if (dip == null) {
@@ -701,7 +718,7 @@ async function call_ajax_delete_data(id) {
     var data = new FormData;
     data.append("idAt", id);
 
-    fetch('adminsez/admin/ajax/deletedatact.php', {
+    fetch(apiBaseUrl + '/deletedatact', {
         method: 'POST',
         //headers: {
         //    'Content-Type': 'application/x-www-form-urlencoded'
@@ -716,8 +733,8 @@ async function call_ajax_delete_data(id) {
                 }
                 // Examine the text in the response
                 response.text().then(function (datarisp) {
-
-                    //console.log(datarisp);
+                    datarisp = JSON.parse(datarisp)
+                    // console.log(datarisp);
                     myModalDel.hide();
                     if (datarisp['error'])
                         showMessagge(datarisp['error'], "my-callout-danger", "infoMessagge");
@@ -741,7 +758,7 @@ async function call_ajax_reset_act(id) {
     var data = new FormData;
     data.append("idAt", id);
 
-    fetch('adminsez/admin/ajax/resetactivity.php', {
+    fetch(apiBaseUrl + '/resetactivity', {
         method: 'POST',
         //headers: {
         //    'Content-Type': 'application/x-www-form-urlencoded'
@@ -762,7 +779,7 @@ async function call_ajax_reset_act(id) {
                     /*   console.log(data);*/
                     //trasformo ilJSON in oggetto JS
                     var rig = JSON.parse(datarisp);
-                    //console.log(rig);
+                    console.log(rig);
                     aggiornaRigaTabella(rig, "aftereset");
                 });
             })
@@ -978,6 +995,8 @@ function rolestring(data) {
 
 function aggiornaRigaTabella(rig, campo) {
     let id = rig['idAt'];
+    console.log('campo: ', campo)
+
 
     /*      incorso=document.getElementById("incorso"+id).value;*/
     /*        document.getElementById("name"+id).firstChild.innerHTML=rig['nome'];*/
@@ -1008,30 +1027,39 @@ function aggiornaRigaTabella(rig, campo) {
     }
     else if (campo == "all") {
         console.log(rig);
-        document.getElementById("From" + id).value = rig['dtStart'];
-        document.getElementById("To" + id).value = rig['dtStop'];
-        document.getElementById("rev" + id).innerHTML = rig['rev'];
-        document.getElementById("raut" + id).innerHTML = rig['ruoli'];
-        if (!rig['active']) {
-            document.getElementById("riga" + id).style.backgroundColor = 'var(--bs-light)'; /*var(--bs-light);*/
-            document.getElementById("actanonim" + id).setAttribute('disabled', true);
-            document.getElementById("actanonim" + id).checked = '';
-            //document.getElementById("conf" + id).style.visibility = 'hidden';
+        if (rig.stato != 1) {
+            // console.log('id: ', id)
+            // console.log('from: ', document.getElementById("From" + id))
+            // console.log('dtStart: ', rig['dtStart'])
+            // console.log(rig['dtStart'].replace('T', ' ').slice(0, rig['dtStart'] - 5).toString())
+            document.getElementById("From" + id).innerHTML = new Date(rig['dtStart']).toLocaleString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false }).replace(',', '')
+            // console.log('from: ', document.getElementById("From" + id))
+            document.getElementById("To" + id).innerHTML = new Date(rig['dtStop']).toLocaleString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false }).replace(',', '')
+            document.getElementById("rev" + id).innerHTML = rig['rev'];
+            document.getElementById("raut" + id).innerHTML = rig['ruoli'];
+
+            if (!rig['active']) {
+                document.getElementById("riga" + id).style.backgroundColor = 'var(--bs-light)'; /*var(--bs-light);*/
+                document.getElementById("actanonim" + id).setAttribute('disabled', true);
+                document.getElementById("actanonim" + id).checked = '';
+                //document.getElementById("conf" + id).style.visibility = 'hidden';
+            }
+            else {
+                chk = 'checked';
+                document.getElementById("riga" + id).style.backgroundColor = 'var(--bs-body-bg)';
+                document.getElementById("actactive" + id).checked = chk;
+                if (document.getElementById("actanonim" + id).disabled)
+                    document.getElementById("actanonim" + id).removeAttribute('disabled');
+                /*if (document.getElementById("conf" + id).style.visibility == 'hidden')
+                    document.getElementById("conf" + id).style.visibility = 'visible';*/
+                //console.log('aggiorna riga - getrole activity ' + id);
+                /* call_ajax_getRoleActivity(id);*/
+            }
+            if (rig['anonima'] == false) chk = '';
+            else chk = 'checked';
+            document.getElementById("actanonim" + id).checked = chk;
         }
-        else {
-            chk = 'checked';
-            document.getElementById("riga" + id).style.backgroundColor = 'var(--bs-body-bg)';
-            document.getElementById("actactive" + id).checked = chk;
-            if (document.getElementById("actanonim" + id).disabled)
-                document.getElementById("actanonim" + id).removeAttribute('disabled');
-            /*if (document.getElementById("conf" + id).style.visibility == 'hidden')
-                document.getElementById("conf" + id).style.visibility = 'visible';*/
-            //console.log('aggiorna riga - getrole activity ' + id);
-            /* call_ajax_getRoleActivity(id);*/
-        }
-        if (rig['anonima'] == false) chk = '';
-        else chk = 'checked';
-        document.getElementById("actanonim" + id).checked = chk;
+
     }
     else {
         switch (campo) {

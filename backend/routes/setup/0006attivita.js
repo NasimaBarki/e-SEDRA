@@ -79,7 +79,7 @@ function setAttivitaScadIncorso(act) {
 
     const stato = act.stato;
 
-    if (act.dtStart !== null && act.dtStop !== null && act.active) {
+    if (act.dtStart != null && act.dtStop != null && act.active) {
         const din = new Date(act.dtStart);   // Convert dtStart to a Date object
         const dfin = new Date(act.dtStop);   // Convert dtStop to a Date object
 
@@ -157,7 +157,6 @@ router.get('/ruoliAttivita', async (req, res) => {
             })
 
             if (ra) {
-                console.log('ra', ra)
                 ac[i].raut = ra.ruolo
             }
         }
@@ -343,8 +342,8 @@ router.post('/updateactivity', async (req, res) => {
             riga.blog = results.active
 
             if (riga.dtStart && riga.dtStop) {
-                riga.dtStart = riga.dtStart.toString().substring(0, 16).replace(" ", "T");
-                riga.dtStop = riga.dtStop.toString().substring(0, 16).replace(" ", "T");
+                riga.dtStart = `${riga.dtStart.getFullYear()}-${(riga.dtStart.getMonth() + 1).toString().padStart(2, '0')}-${riga.dtStart.getDate().toString().padStart(2, '0')}T${riga.dtStart.getHours().toString().padStart(2, '0')}:${riga.dtStart.getMinutes().toString().padStart(2, '0')}`
+                riga.dtStop = `${riga.dtStop.getFullYear()}-${(riga.dtStop.getMonth() + 1).toString().padStart(2, '0')}-${riga.dtStop.getDate().toString().padStart(2, '0')}T${riga.dtStop.getHours().toString().padStart(2, '0')}:${riga.dtStop.getMinutes().toString().padStart(2, '0')}`
             }
 
             for (const [key, value] of Object.entries(riga)) {
@@ -408,5 +407,122 @@ router.post('/updateroleactivity', async (req, res) => {
             res.status(500).send('Errore query ruoli attivita')
         }
     }
+})
+
+router.post('/resetactivity', async (req, res) => {
+    const ida = req.body.idAt
+    let sql = ''
+    if (ida) {
+        let anon = 0
+        let ack = 1
+        if (ida == 103 || ida == 203)
+            ack = 0
+        if (ida == 101 || ida == 201 || ida == 300)
+            anon = 1
+
+        sql += "UPDATE attivita SET active=" + ack + ", anonima=" + anon + ", ballottaggio=0, stato=DEFAULT, giorninoti=DEFAULT,"
+        sql += "dtStart=NULL, notistart=DEFAULT, dtStop=NULL, notistop=DEFAULT, revisore=NULL, altridati=NULL WHERE idAt=" + ida + ";"
+        sql += "DELETE FROM attRuoli WHERE activity = " + ida + ";"
+
+        if (ida == 104)
+            sql += "UPDATE numberOfStars SET vbis=1;"
+        else if (ida == 204)
+            sql += "UPDATE numberOfStars SET vpro=1;"
+
+        try {
+            await sequelize.query(sql)
+
+            sql = "SELECT * FROM attivita WHERE idAt = " + ida + ";"
+            const [results, metadata] = await sequelize.query(sql, { type: sequelize.QueryTypes.RAW })
+
+
+            console.log(results)
+            res.json(results[0])
+        } catch (error) {
+            console.log(error)
+            res.sendStatus(500)
+        }
+    }
+})
+
+router.post('/deletedatact', async (req, res) => {
+    const ida = parseInt(req.body.idAt)
+    let output = {}
+    let sql = ''
+
+    if (ida) {
+        sql = "SELECT stato FROM attivita WHERE idAt = " + ida + ";"
+
+        try {
+            let [rec, metadata] = await sequelize.query(sql, { type: sequelize.QueryTypes.RAW })
+            rec = rec[0]
+
+            if (rec.stato == 2) {
+                switch (ida) {
+                    case 101:
+                        sql = "DELETE FROM bisogni;";
+                        output.success = "Bisogni eliminati definitivamente";
+                        break;
+                    case 102:
+                        // No deletion for case 102
+                        output.success = "Dati cancellati"
+                        break;
+                    case 103:
+                        sql = "DELETE FROM segnalaCommB; DELETE FROM blogB;";
+                        output.success = "Commenti sui Bisogni eliminati definitivamente";
+                        break;
+                    case 104:
+                        sql = "DELETE FROM valBis; DELETE FROM miPiaceB;";
+                        output.success = "Voti e like sui Bisogni eliminati definitivamente";
+                        break;
+                    case 105:
+                        sql = "DELETE FROM gradBisogni;";
+                        output.success = "Graduatoria Bisogni eliminata definitivamente";
+                        break;
+                    case 201:
+                        sql = "DELETE FROM propBis; DELETE FROM proposte;";
+                        output.success = "Proposte eliminati definitivamente";
+                        break;
+                    case 202:
+                        // No deletion for case 202
+                        break;
+                    case 203:
+                        sql = "DELETE FROM segnalaCommP; DELETE FROM blogP;";
+                        output.success = "Commenti sulle Proposte eliminati definitivamente";
+                        break;
+                    case 204:
+                        sql = "DELETE FROM valPrp; DELETE FROM miPiaceP;";
+                        output.success = "Voti e like delle Proposte eliminati definitivamente";
+                        break;
+                    case 205:
+                        sql = "DELETE FROM gradProposte;";
+                        output.success = "Graduatoria Proposte eliminata definitivamente";
+                        break;
+                    default:
+                        output.error = "Attività non riconosciuta";
+                        break;
+                }
+
+                if (sql) {
+                    // Execute the delete query
+                    await sequelize.query(sql, { type: sequelize.QueryTypes.RAW });
+                } else {
+                    output.error = "L'attività non ha dati da cancellare";
+                }
+            } else {
+                output.error = "Attività in corso, dati non cancellabili";
+            }
+        } catch (error) {
+            console.log(error)
+            res.sendStatus(500).send('Errore query select attivita')
+        }
+    }
+    else {
+        output.error = "Attività non specificata";
+    }
+    console.log('output: ', output)
+
+    res.json(output);
+
 })
 module.exports = router

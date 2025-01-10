@@ -25,11 +25,11 @@ import Stelle from '../components/Stelle.vue'
                             <!--<h4 class="mt-3" id="titoloAttivi">titolo</h4>-->
                             <form method="post" id="ACTform" action="" class="row g-3 align-items-center">
                                 <fieldset id="allbuttonAct" class="row g-3 align-items-center">
-                                    <input type="hidden" id="idAttCorrente" value="<?php if(isset($facti['idAt'])) echo $facti['idAt'];?>" name="idAt" />
-                                    <input type="hidden" id="idTLCorrente" value="<?php if(isset($facti['dipendeda'])) echo $facti['dipendeda'];?>" name="idtl" />
+                                    <input type="hidden" id="idAttCorrente" v-bind:value="facti.idAt" name="idAt" />
+                                    <input type="hidden" id="idTLCorrente" v-bind:value="facti.dipendeda" name="idtl" />
                                     <div class="form-floating col-md-6">
                                         <input class="Dfrom form-control" id="dtStart" type="datetime-local" name="dtStart"
-                                            required />
+                                            required v-bind:value="facti.dtStart"/>
                                             <!-- <?php if (isset($facti['dtStart']) && $facti['dtStart']!="") {
                                             $value=str_replace(" ", "T", $facti['dtStart']);
                                              echo "value=".$value;
@@ -44,12 +44,9 @@ import Stelle from '../components/Stelle.vue'
                                     <div class="form-floating col-md-6">
 
                                         <input class="Dto form-control" id="dtStop" type="datetime-local" name="dtStop"
-                                            required />
-                                            <!-- <?php if (isset($facti['dtStop']) && $facti['dtStop'] !="") {                                          
-                                            $value = str_replace(" ", "T", $facti['dtStop']);
-                                            echo "value=".$value;
-                                        }?
-                                            <?php if (!isset($facti['dtStart']) || $facti['dtStart']==0) echo "disabled"; else echo " min=". str_replace(" ", "T", $facti['dtStart']);?>  -->
+                                            required v-bind:value="facti.dtStop" :disabled="facti.dtStart == null || facti.dtStart == 0" v-bind:min="facti.dtStart != null"/>
+
+                                            <!-- <?php if (!isset($facti['dtStart']) || $facti['dtStart']==0) echo "disabled"; else echo " min=". str_replace(" ", "T", $facti['dtStart']);?>  -->
 
 
                                         <label class="form-label" for="dtStop"> Al: </label>
@@ -59,23 +56,30 @@ import Stelle from '../components/Stelle.vue'
                                         <select class="form-select" id="revisore" name="revisore" required>
                                             <option disabled selected>Non attivato</option>
                                             <template v-for="row in roles">
-                                                <option class="optionGroup" v-if="row.primario" v-bind:value='row.idRl'>{{ row.ruolo }}</option>
-                                                <option class="optionChild" v-else v-bind:value='row.idRl'>{{ row.ruolo }}</option>
+                                                <option class="optionGroup" v-if="row.primario" v-bind:value='row.idRl' :selected="facti.revisore != null && row.idRl == facti.revisore">{{ row.ruolo }}</option>
+                                                <option class="optionChild" v-else v-bind:value='row.idRl' :selected="facti.revisore != null && row.idRl == facti.revisore">{{ row.ruolo }}</option>
                                             </template>
                                         </select>
                                         <label class="form-label" for="revisore">Ruolo Revisore:</label>
                                     </div>
                                     <div class="form-floating col-6">
                                         <div id="attivablog" class="btn-group" role="group" aria-label="Attivazione Blog">
-                                            <input type="checkbox" class="btn-check" name="btnattivablog" id="blogactive" autocomplete="off" value="0"  />
+                                            <input type="checkbox" class="btn-check" name="btnattivablog" id="blogactive" autocomplete="off" value="0" :checked="facti.blog != null && facti.blog == 1"/>
                                             <!-- <?php if(isset($facti['blog']) && $facti['blog']==1) echo "checked";?> -->
-                                            <label class="btn btn-outline-primary" for="blogactive"></label>
+                                            <label class="btn btn-outline-primary" for="blogactive">
+                                                <template v-if="facti.blog == 1">
+                                                    Discussione attivata
+                                                </template>
+                                                <template v-else>
+                                                    Attiva discussione
+                                                </template>
+                                            </label>
                                             <!-- <?php if(isset($facti['blog']) && $facti['blog']==1) echo "Discussione Attivata"; else echo "Attiva Discussione";?> -->
                                         </div>
                                     </div>
                                     <div class="form-floating col-6">
                                         <div id="secondvot" class="btn-group" role="group" aria-label="Seconda Votazione">
-                                            <input type="checkbox" class="btn-check" name="ballottaggio" id="ballottaggio" autocomplete="off" value="1"  />
+                                            <input type="checkbox" class="btn-check" name="ballottaggio" id="ballottaggio" autocomplete="off" value="1" :checked="facti.ballottaggio == 1" />
                                             <!-- <?php if(isset($facti['ballottaggio']) && $facti['ballottaggio']==1) echo "checked";?> -->
                                             <label class="btn btn-outline-primary" for="ballottaggio">
                                                 Seconda Votazione
@@ -83,11 +87,11 @@ import Stelle from '../components/Stelle.vue'
                                         </div>
                                     </div>
                                     <div id="doposettimane" class="form-floating col-7">
-                                        <input class="form-control" id="altridati" type="number" name="altridati" min="0" value="<?php if(isset($facti['altridati'])) echo $facti['altridati'];?>" />
+                                        <input class="form-control" id="altridati" type="number" name="altridati" min="0" v-bind:value="facti.altridati" />
                                         <label class="form-label" for="altridati">Elimina dopo settimane: </label>
                                     </div>
                                     <div id="giornipreavviso" class="form-floating col-12">
-                                        <input class="form-control" id="giorninoti" type="number" name="giorninoti" min="0" value="<?php if(isset($facti['giorninoti'])) echo $facti['giorninoti'];?>" />
+                                        <input class="form-control" id="giorninoti" type="number" name="giorninoti" min="0" v-bind:value="facti.giorninoti" />
                                         <label class="form-label" for="giorninoti">Giorni di preavviso notifica: </label>
                                     </div>
                                     <div class="form-floating col-12">
@@ -146,10 +150,10 @@ import Stelle from '../components/Stelle.vue'
                         </thead>
                         <tbody>
                             <template v-for="ac in acti" v-bind:key = ac.idAt>
-                                <tr v-bind:id="'riga' + ac['idAt']" v-bind:style = "ac.bg">
+                                <tr v-bind:id="'riga' + ac['idAt']" v-bind:style="{ backgroundColor: ac.bg }">
                                             <td>
                                                 <input type="hidden" v-bind:id="'tl' + ac['idAt']" v-bind:name="'tl' + ac['idAt']" v-bind:value="ac['dipendeda']"/>
-                                                <button type="button" class="btn icona" data-bs-toggle="tooltip" title="Configura" v-bind:data-idact="ac['idAt']" v-bind:id="'conf' + ac['idAt']" v-bind:value="ac['idAt']" name="config-act" >
+                                                <button v-on:click="facti = ac; replaceDate()" type="button" class="btn icona" data-bs-toggle="tooltip" title="Configura" v-bind:data-idact="ac['idAt']" v-bind:id="'conf' + ac['idAt']" v-bind:value="ac['idAt']" name="config-act" >
                                                     <span class="bi bi-gear"></span>
                                                 </button>
 
@@ -163,12 +167,12 @@ import Stelle from '../components/Stelle.vue'
                                                 Attivit&agrave; in corso, solo modifiche autorizzate ...
                                                 <input type="hidden" v-bind:id="'incorso' + ac['idAt']" v-bind:name="'incorso' + ac['idAt']" v-bind:value="ac['stato']" />
                                                 <input type="hidden" v-bind:id="'From' + ac['idAt']" v-bind:value="ac['dtStart']"
-                                                           
+                    
                                                            />
-                                                           {{ ac.dtStart }}
+
+
                                                 <input type="hidden" v-bind:id="'hTo' + ac['idAt']" v-bind:value="ac['dtStop']"
-                                                           />
-                                                           {{ ac.dtStop }}
+                                                           /> 
                                                 <input type="text" v-bind:id="'rev' + ac['idAt']"
                                                    readonly disabled hidden />
                                                 <input type="text" v-bind:id="'raut' + ac['idAt']"
@@ -187,11 +191,16 @@ import Stelle from '../components/Stelle.vue'
                                             <td class="d-none" v-bind:id="'scad' + ac['idAt']">
                                                     </td>
                                             <td v-bind:id="'From' + ac['idAt']">
+                                                <template v-if="ac.dtStart && ac.dtStart != ''">
+                                                    {{ new Date(ac.dtStart).toLocaleString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false }).replace(',', '') }}
+                                                </template>
                                             </td>
 
                                             <td v-bind:id="'To' + ac['idAt']">
                                                <input type="hidden" v-bind:id="'hTo' + ac['idAt']" v-bind:name="'hTo' + ac['idAt']" v-bind:value="ac['dtStop']" />
-
+                                               <template v-if="ac.dtStop && ac.dtStop != ''">
+                                                    {{ new Date(ac.dtStop).toLocaleString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false }).replace(',', '') }}
+                                                </template>
                                             </td>
 
                                             <td v-bind:id="'rev' + ac['idAt']">
@@ -316,6 +325,7 @@ export default {
             acti: undefined,
             ruoli: [],
             roles: undefined,
+            facti: {}
         }
     },
     async mounted() {
@@ -324,8 +334,7 @@ export default {
         await this.associaRuoliAttivita()
         this.selectPrimaryRoles()
         this.getRuoli()
-
-        console.log(this.acti)
+        // console.log(this.acti)
     },
     methods:
     {
@@ -338,6 +347,7 @@ export default {
             let res = await axios.get(this.apiBaseUrl + '/ruoliAttivita')
             //console.log(res.data)
             this.acti = res.data
+            this.associaBgAttivita()
         },
         async selectPrimaryRoles() {
             let res = await axios.get(this.apiBaseUrl + '/getRuoliAll')
@@ -369,14 +379,22 @@ export default {
         associaBgAttivita() {
             for(let i = 0; i < this.acti.length; i++) {
                 if(this.acti[i].active == false)
-                    this.acti[i].bg = 'background-color:var(--bs-light)'
+                    this.acti[i].bg = 'var(--bs-light)'
                 else if(this.acti[i].stato == 1)
-                    this.acti[i].bg == 'background-color:var(--bs-danger)'
+                    this.acti[i].bg = 'var(--bs-danger)'
                 else if(this.acti[i].stato == 2)
-                    this.acti[i].bg == 'background-color:var(--bs-warning)'
+                    this.acti[i].bg = 'var(--bs-warning)'
                 else
-                    this.acti[i].bg == ''
+                    this.acti[i].bg = ''
             }
+        },
+        replaceDate() {
+            if(this.facti.dtStart != null)
+                this.facti.dtStart = this.facti.dtStart.replace('T', ' ').slice(0, this.facti.dtStart.length - 5) 
+            if(this.facti.dtStop != null)
+                this.facti.dtStop = this.facti.dtStop.replace('T', ' ').slice(0, this.facti.dtStop.length - 5)
+
+            // console.log(this.facti.dtStart)
         }
     }
 }

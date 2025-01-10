@@ -138,7 +138,7 @@ export function loginScript(updateUserCallback) {
                     .then(result => {
                         // Qui gestisci la risposta come nel tuo codice jQuery
                         // Per esempio:
-                        //alert("Result " + result);
+                        // alert("Result " + result);
                         if (result.substring(0, 2) === '->') {
                             alert('Errore 000-9: ' + result);
                             logerror('-9', url, result); // Assicurati di convertire anche logerror in vanilla JS se necessario

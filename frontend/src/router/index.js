@@ -8,6 +8,7 @@ import Utenti from '../views/Utenti.vue'
 import Logfile from '../views/Logfile.vue'
 import Generale from '../views/Generale.vue'
 import Attivita from '@/views/Attivita.vue'
+import BisogniBase from '@/views/BisogniBase.vue'
 
 const routes = [
     {
@@ -49,6 +50,11 @@ const routes = [
         path: '/attivita',
         name: 'attivita',
         component: Attivita
+    },
+    {
+        path: '/bisognibase',
+        name: 'bisogni',
+        component: BisogniBase
     }
 ]
 

@@ -169,6 +169,7 @@ router.get('/ruoliAttivita', async (req, res) => {
 })
 
 router.post('/updateactivity', async (req, res) => {
+    console.log('updateactivity ', req.body)
     const select = req.body.select
     let idAt = req.body.idAt
     const blog = req.body.blog
@@ -232,8 +233,8 @@ router.post('/updateactivity', async (req, res) => {
 
             for (let i = 1; i <= 10; i++) {
                 let ind = 'val' + i
-                let sta = indPost
-                sqls += 'UPDATE numberOfStars SET ' + field + '= ' + sta + ' WHERE idstar=' + i
+                let sta = req.body[ind]
+                sqls += ' UPDATE numberOfStars SET ' + field + '= ' + sta + ' WHERE idstar=' + i + ';'
             }
 
             sqla += ' altridati=1,'
@@ -289,17 +290,17 @@ router.post('/updateactivity', async (req, res) => {
         if (sqlb != 'UPDATE attivita SET ') {
             if (sqlb.charAt(sqlb.length - 1) == ',')
                 sqlb = sqlb.slice(0, -1)
-            sqlb += ' WHERE idAt = ' + idAt + ';'
+            sqlb += ' WHERE idAt = ' + idprec + ';'
             qsql += sqlb
         }
         if (sqlc != 'UPDATE attivita SET ') {
             if (sqlc.charAt(sqlc.length - 1) == ',')
                 sqlc = sqlc.slice(0, -1)
-            sqlc += ' WHERE idAt = ' + idAt + ';'
+            sqlc += ' WHERE idAt = ' + idnex + ';'
             qsql += sqlc
         }
         if (sqls != '')
-            qsql += sqsl
+            qsql += sqls
         if (qsql != '') {
             try {
                 await sequelize.query(qsql)
@@ -309,66 +310,101 @@ router.post('/updateactivity', async (req, res) => {
             }
         }
         if (controllo != null) {
-            // TODO: 
-            console.log('FAI IL CONTROLLO')
-        }
-        if (select) {
-            sql = "SELECT attivita.*,ruoli.ruolo as rev FROM attivita left join ruoli on ruoli.idRl=attivita.revisore WHERE idAt=" + ida + ";"
-        }
-        else
-            sql = "SELECT attivita.*,ruoli.ruolo as rev FROM attivita left join ruoli on ruoli.idRl=attivita.revisore WHERE idAt=" + ida + ";";
+            let idAt = controllo - 1;
+            let sql = `SELECT idAt FROM attivita WHERE idAt = ${idAt} AND dtStart >= (SELECT dtStart FROM attivita WHERE idAt = ${controllo}) AND dtStart <= (SELECT dtStop FROM attivita WHERE idAt = ${controllo})`;
 
-        try {
-            if (config.database.dbms == 'SQL Server') {
-                type = false
-            }
-            else if (config.database.dbms == 'My SQL') {
-                type = true
-            }
-            let [results, metadata] = await sequelize.query(sql, {
-                ...type && { type: sequelize.QueryTypes.SELECT }
-            })
-            riga = results
+            try {
+                const [results] = await sequelize.query(sql, { type: sequelize.QueryTypes.SELECT });
 
-            if (riga.idAt == 104 || riga.idAt == 204) {
-                let idisc = riga.idAt - 1
-                sql = "SELECT attivita.active FROM attivita WHERE idAt=" + idisc + ";"
-            }
-
-            [results, metadata] = await sequelize.query(sql, {
-                ...type && { type: sequelize.QueryTypes.SELECT }
-            })
-
-            riga.blog = results.active
-
-            if (riga.dtStart && riga.dtStop) {
-                riga.dtStart = `${riga.dtStart.getFullYear()}-${(riga.dtStart.getMonth() + 1).toString().padStart(2, '0')}-${riga.dtStart.getDate().toString().padStart(2, '0')}T${riga.dtStart.getHours().toString().padStart(2, '0')}:${riga.dtStart.getMinutes().toString().padStart(2, '0')}`
-                riga.dtStop = `${riga.dtStop.getFullYear()}-${(riga.dtStop.getMonth() + 1).toString().padStart(2, '0')}-${riga.dtStop.getDate().toString().padStart(2, '0')}T${riga.dtStop.getHours().toString().padStart(2, '0')}:${riga.dtStop.getMinutes().toString().padStart(2, '0')}`
-            }
-
-            for (const [key, value] of Object.entries(riga)) {
-                if (JSON.stringify(value).includes('Buffer')) {
-                    let num = JSON.stringify(value).slice(-3, JSON.stringify(value).length - 2)
-                    riga[key] = parseInt(num)
+                if (results.length > 0) {
+                    // There is an overlapping activity
+                    return res.json({ success: false, message: 'Sovrapposizione trovata.' });
+                } else {
+                    // No overlap
+                    return res.json({ success: true });
                 }
+            } catch (error) {
+                console.error(error);
+                return res.status(500).send('Errore nella verifica delle attività contemporanee');
             }
+        }
+        else {
+            if (select) {
+                sql = "SELECT attivita.*,ruoli.ruolo as rev FROM attivita left join ruoli on ruoli.idRl=attivita.revisore WHERE idAt=" + ida + ";"
+            }
+            else
+                sql = "SELECT attivita.*,ruoli.ruolo as rev FROM attivita left join ruoli on ruoli.idRl=attivita.revisore WHERE idAt=" + ida + ";";
 
-            res.json(riga)
-        } catch (error) {
-            console.log(error)
-            res.status(500).send('Errore query seleziona attivita')
+            try {
+                if (config.database.dbms == 'SQL Server') {
+                    type = false
+                }
+                else if (config.database.dbms == 'My SQL') {
+                    type = true
+                }
+                let [results, metadata] = await sequelize.query(sql, {
+                    ...type && { type: sequelize.QueryTypes.SELECT }
+                })
+                riga = results
+
+                if (riga.idAt == 104 || riga.idAt == 204) {
+                    let idisc = riga.idAt - 1
+                    sql = "SELECT attivita.active FROM attivita WHERE idAt=" + idisc + ";"
+                }
+
+                [results, metadata] = await sequelize.query(sql, {
+                    ...type && { type: sequelize.QueryTypes.SELECT }
+                })
+
+                riga.blog = results.active
+
+                if (riga.dtStart && riga.dtStop) {
+                    riga.dtStart = `${riga.dtStart.getFullYear()}-${(riga.dtStart.getMonth() + 1).toString().padStart(2, '0')}-${riga.dtStart.getDate().toString().padStart(2, '0')}T${riga.dtStart.getHours().toString().padStart(2, '0')}:${riga.dtStart.getMinutes().toString().padStart(2, '0')}`
+                    riga.dtStop = `${riga.dtStop.getFullYear()}-${(riga.dtStop.getMonth() + 1).toString().padStart(2, '0')}-${riga.dtStop.getDate().toString().padStart(2, '0')}T${riga.dtStop.getHours().toString().padStart(2, '0')}:${riga.dtStop.getMinutes().toString().padStart(2, '0')}`
+                }
+
+                for (const [key, value] of Object.entries(riga)) {
+                    if (JSON.stringify(value).includes('Buffer')) {
+                        let num = JSON.stringify(value).slice(-3, JSON.stringify(value).length - 2)
+                        riga[key] = parseInt(num)
+                    }
+                }
+
+                console.log('sqla ', sqla)
+                console.log('sqlb ', sqlb)
+                console.log('sqlc ', sqlc)
+
+                res.json(riga)
+            } catch (error) {
+                console.log(error)
+                res.status(500).send('Errore query seleziona attivita')
+            }
         }
     }
 })
 
+router.post('/getRuolidiAttivita', async (req, res) => {
+    let body = JSON.parse(req.body.data)
+    let sql = 'SELECT * FROM attruoli WHERE activity = ' + body.id
+
+    try {
+        const [results, metadata] = await sequelize.query(sql)
+
+        console.log(results)
+        res.json(results)
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).send('Errore query seleziona ruoli attivita')
+    }
+})
+
 router.post('/updateroleactivity', async (req, res) => {
-    console.log('eao')
-    console.log(req.body)
 
     const ida = req.body.activity
     const ruoli = JSON.parse(req.body.ruoli)
 
-    console.log(ruoli)
+    console.log('ruoli ', ruoli)
     if (ruoli) {
         let sql = 'DELETE FROM attRuoli WHERE activity=' + ida + ';'
         let t = 0

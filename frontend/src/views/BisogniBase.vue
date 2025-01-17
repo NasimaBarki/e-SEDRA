@@ -1,4 +1,6 @@
 <script setup>
+import BisogniDiscutaVota from '@/components/BisogniDiscutiVota.vue';
+import BisogniRevisione from '@/components/BisogniRevisione.vue';
 import BisogniSegnala from '@/components/BisogniSegnala.vue';
 </script>
 
@@ -6,6 +8,8 @@ import BisogniSegnala from '@/components/BisogniSegnala.vue';
     <template v-if="nat != 0">
         <template v-for="mom in moment">
             <BisogniSegnala v-if="mom.idAt == 101 && Abisogni.IamAuthor" :Abisogni = 'Abisogni' :posts = 'posts' :topics = 'topics' :user = 'user'/>
+            <BisogniRevisione v-if="mom.idAt == 102 && Rbisogni.IamRev" :Rbisogni = 'Rbisogni' :Rposts = 'Rposts' :topics = 'topics' :user = 'user'/>
+            <BisogniDiscutaVota v-if="((mom.idAt == 104 && !fasiID.includes(103)) || (mom.idAt == 103 && fasiID.includes(104))) && (VDbisogni.IamRev || VDbisogni.IamAuthor)" :VDbisogni = 'VDbisogni' :VDposts = 'VDposts' :user = 'user'/>
         </template>
     </template>
 </template>
@@ -18,13 +22,19 @@ export default {
     data() {
         return{
             posts: [],
+            Rposts: [],
             notable: false,
             topics: null,
             conta: 0,
             moment: null,
             nat: null,
-            Abisogni: null,
-            notable: true
+            Abisogni: {},
+            notable: true,
+            Rbisogni: {},
+            VDbisogni: {},
+            fasiID: [],
+            VDposts: [],
+            Dbisogni: {}
         }
     },
     mounted() {
@@ -55,8 +65,8 @@ export default {
             }
         },
         compareRuoli(sezau, ruser) {
-            // console.log(sezau)
-            // console.log(ruser)
+            // console.log('Sezau ', sezau)
+            // console.log('Ruser ', ruser)
 
             let k = Object.keys(ruser)
             
@@ -80,6 +90,12 @@ export default {
         },
         async populateBisogni() {
             for(let i in this.moment) {
+                this.fasiID.push(this.moment[i].idAt)
+            }
+
+            // console.log('Moment ', this.moment)
+
+            for(let i in this.moment) {
                 if(this.moment[i].idAt == 101) {
                     this.Abisogni = this.moment[i]
                     this.Abisogni.bisAct = true
@@ -96,6 +112,104 @@ export default {
 
                         let res = await axios.post(this.apiBaseUrl + '/postsdatelimited', {data: JSON.stringify(obj)})
                         this.posts = res.data
+                    }
+                }
+                if(this.moment[i].idAt == 102) {
+                    this.Rbisogni = this.moment[i]
+                    this.Rbisogni.revBis = true
+                    this.Rbisogni.IamRev = this.IamRevisor(this.Rbisogni.revisore, this.user.roles)
+                    this.Rbisogni.author = false
+
+                    if(!this.Rbisogni.IamRev)
+                        this.notable = true
+                    else {
+                        let obj = {}
+                        obj.table = 'bisogni'
+                        obj.role = 'revisor'
+                        obj.idUs = this.user.idUs
+
+                        let res = await axios.post(this.apiBaseUrl + '/postsdatelimited', {data: JSON.stringify(obj)})
+                        this.Rposts = res.data
+                    }
+                }
+                if(this.moment[i].idAt == 103 && this.fasiID.includes(104)) {
+                    for (const [key, value] of Object.entries(this.moment)) {
+                        if(value.idAt == 104)
+                            this.VDbisogni = value
+                    }
+                    // console.log('VDbisogni ', this.VDbisogni)
+                    this.VDbisogni.from = 104
+                    this.VDbisogni.votAct = true
+                    this.VDbisogni.blogAct = true
+                    let field = 'pubblicato'
+                    if(this.VDbisogni.ballottaggio)
+                        field = 'ingrad'
+                    
+                    this.VDbisogni.IamAuthor = this.compareRuoli(this.VDbisogni.author, this.user.roles)
+                    this.VDbisogni.IamRev = this.IamRevisor(this.VDbisogni.revisore, this.user.roles)
+
+                    if(this.VDbisogni.IamAuthor || this.VDbisogni.IamRev) {
+                        let obj = {}
+                        obj.anonym = true
+                        obj.field = field
+                        obj.userId = this.user.idUs
+
+                        let res = await axios.post(this.apiBaseUrl + '/getAllPublishBisWithGrade', {data: JSON.stringify(obj)})
+                        this.VDposts = res.data
+
+                        // console.log('VDposts ', this.VDposts)
+                        for(let po in this.VDposts) {
+                            let like = await axios.post(this.apiBaseUrl + '/getMyLikeBAllPost', {data: JSON.stringify({idBs: this.VDposts[po].idBs, idUs: this.user.idUs, at: 104})})
+                            if(like != null)
+                                this.VDposts[po].nlike = 1
+                        }
+                    }
+                    else {
+                        notable = true
+                    }
+                }
+                if(this.moment[i].idAt == 103 && !this.fasiID.includes(104)) {
+                    this.Dbisogni = this.moment[i]
+                    this.Dbisogni.from = 103
+                    this.Dbisogni.votAct = true
+                    this.Dbisogni.blogAct = true
+                    let field = 'pubblicato'
+                    if(this.VDbisogni.ballottaggio)
+                        field = 'ingrad'
+                    this.Dbisogni.IamAuthor = this.compareRuoli(this.Dbisogni.author, this.user.roles)
+                    this.Dbisogni.IamRev = this.IamRevisor(this.Dbisogni.revisore, this.user.roles)
+
+                }
+                if(this.moment[i].idAt == 104 && !this.fasiID.includes(103)) {
+                    this.VDbisogni = this.moment[i]
+                    // console.log('VDbisogni ', this.moment[i])
+                    this.VDbisogni.from = 104
+                    this.VDbisogni.votAct = true
+                    this.VDbisogni.blogAct = false
+                    let field = 'pubblicato'
+                    if(this.VDbisogni.ballottaggio)
+                        field = 'ingrad'
+                    this.VDbisogni.IamAuthor = this.compareRuoli(this.VDbisogni.author, this.user.roles)
+                    this.VDbisogni.IamRev = this.IamRevisor(this.VDbisogni.revisore, this.user.roles)
+
+                    if(this.VDbisogni.IamAuthor || this.VDbisogni.IamRev) {
+                        let obj = {}
+                        obj.anonym = true
+                        obj.field = field
+                        obj.userId = this.user.idUs
+
+                        let res = await axios.post(this.apiBaseUrl + '/getAllPublishBisWithGrade', {data: JSON.stringify(obj)})
+                        this.VDposts = res.data
+
+                        // console.log('VDposts ', this.VDposts)
+                        for(let po in this.VDposts) {
+                            let like = await axios.post(this.apiBaseUrl + '/getMyLikeBAllPost', {data: JSON.stringify({idBs: this.VDposts[po].idBs, idUs: this.user.idUs, at: 104})})
+                            if(like != null)
+                                this.VDposts[po].nlike = 1
+                        }
+                    }
+                    else {
+                        notable = true
                     }
                 }
             }

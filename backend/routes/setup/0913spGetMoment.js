@@ -86,10 +86,9 @@ async function getRuoliAutorizzati(idAt) {
 router.get('/getMoment', async (req, res) => {
     let sql = 'CALL getMoment'
     try {
-        let [results, metadata] = await sequelize.query(sql)
+        let results = await sequelize.query(sql, { type: sequelize.QueryTypes.RAW })
         let n = 0
         if (results != undefined) {
-            results = [results]
             for (let i = 0; i < results.length; i++) {
                 for (const [key, value] of Object.entries(results[i])) {
                     if (JSON.stringify(value).includes('Buffer')) {
@@ -102,6 +101,9 @@ router.get('/getMoment', async (req, res) => {
 
             for (let i in results) {
                 delete results[i].note
+                // console.log(results[i])
+                // console.log(results[i].active)
+
                 if (results[i].active) {
                     let tot = calcolaTempoAllaScadenza(results[i].dtStop)
                     results[i].ggscad = ' ' + tot.d + 'g ' + tot.h + 'h ' + tot.i + 'm ' + tot.s + 's '

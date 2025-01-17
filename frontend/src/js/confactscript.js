@@ -192,11 +192,41 @@ function serializeRuoli() {
     return ruol;
 }
 
+// function parseRuoli(input) {
+//     const roles = {};
+//     // const regex = /(\w+)(?:\s\[(.+?)\])?/g;
+//     // let match;
+//     // let index = 0;
+//     console.log('input ', input)
+
+//     let prova = input.split(' - ')
+//     // console.log('input: ', prova)
+
+//     for (let ruolo in prova) {
+//         let item = {}
+//         item.idR = prova[ruolo]
+//         let sottoruoli = null
+//         if (prova[ruolo].includes('[')) {
+//             item.idR = prova[ruolo].slice(0, prova[ruolo].indexOf('[') - 1)
+//             sottoruoli = prova[ruolo].slice(prova[ruolo].indexOf('[') + 1, prova[ruolo].length - 1)
+//             sottoruoli = sottoruoli.split(', ')
+//         }
+//         item.idS = sottoruoli
+//         roles[ruolo] = item
+//     }
+
+//     return roles
+// }
+
+
 function checkedRuoli(ut)       //passato ut['ruolo']
 {
     // console.log('ut: ', ut)
     // console.log(Object.keys(ut).length)
     resetRuoliPrimSec();
+    // console.log('ut ', ut)
+    // ut = parseRuoli(ut)
+
     //console.log('In checked ruoli ' + ut);
     var tr = document.getElementById("TR");
     var rp = document.querySelectorAll('.ruoliprimari');
@@ -204,16 +234,19 @@ function checkedRuoli(ut)       //passato ut['ruolo']
         // console.log(ut[i]);  // Ensure that you don't try to access ut[i] when it's undefined.
         if (ut[i] && ut[i]['ruolo']) { // Check if ut[i] exists before accessing 'ruolo'
             for (let j = 0; j < rp.length; j++) {
+                console.log(ut[i])
                 let na = rp[j].getAttribute('data-lui');
                 if (rp[j].getAttribute('data-nomeruolo') == ut[i]['ruolo']) {
                     rp[j].checked = true;
                     let dv = document.getElementById("dv" + na);
                     dv.classList.add('show');
-                    if (ut[i]['subruolo'] != 0) {
+                    if (ut[i]['subruolo'] != null) {
                         let rss = dv.querySelectorAll(".ruolisec");
                         for (let k = 0; k < rss.length; k++) {
-                            if (rss[k].value == ut[i]['subruolo'])
+                            if (rss[k].value == ut[i]['idS'])
                                 rss[k].checked = true;
+                            // console.log('rss ', rss[k].value)
+                            // console.log('ut ', ut[i]['subruolo'])
                         }
                     }
                 }
@@ -497,6 +530,10 @@ async function call_ajax_edit_act(act) {
     data.append("select", "1");
     data.append("idAt", act);
     //console.log(act + '  ' + data);
+    console.log('DATA')
+    for (var pair of data.entries()) {
+        console.log(pair[0] + ', ' + pair[1]);
+    }
 
     let tuttepromesse = [];
     let promo1 = fetch(apiBaseUrl + '/updateactivity', {
@@ -556,12 +593,14 @@ async function call_ajax_edit_act(act) {
 
         }
         //else
-        console.log('results: ', results[0])
+        // console.log('results: ', results[0])
         showActivity(results[0], retroDate);
         //console.log('results ' + results[0]['nome']);        
     }
     // console.log('r1 ' + JSON.stringify(results[1]));
     // console.log(results[1][0])
+    // console.log('results ', results)
+
     if (results[1])
         checkedRuoli(results[1]);
     else
@@ -662,7 +701,7 @@ function defineDateStartStop(act, retroDate) {
     if (di.disabled) {
         di.removeAttribute('disabled');
     }
-    console.log(act)
+    // console.log(act)
     di.value = act['dtStart'];
 
     //console.log("act ", act['dtStart']);
@@ -779,7 +818,7 @@ async function call_ajax_reset_act(id) {
                     /*   console.log(data);*/
                     //trasformo ilJSON in oggetto JS
                     var rig = JSON.parse(datarisp);
-                    console.log(rig);
+                    // console.log(rig);
                     aggiornaRigaTabella(rig, "aftereset");
                 });
             })
@@ -835,6 +874,7 @@ async function call_ajax_save_act(act, ruoliAuto) {
     //data1['dtStart'] = dti;
     //console.log("senza T "+dti);
 
+    console.log('ruoliStringify ', JSON.stringify(ruoliAuto))
     data1.append("activity", act);
     data1.append("ruoli", JSON.stringify(ruoliAuto));
     /* console.log('ruoli prima di post'+ruoliAuto+'  '+data1["ruoli"]);*/
@@ -1037,6 +1077,8 @@ function aggiornaRigaTabella(rig, campo) {
             document.getElementById("To" + id).innerHTML = new Date(rig['dtStop']).toLocaleString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false }).replace(',', '')
             document.getElementById("rev" + id).innerHTML = rig['rev'];
             document.getElementById("raut" + id).innerHTML = rig['ruoli'];
+
+
 
             if (!rig['active']) {
                 document.getElementById("riga" + id).style.backgroundColor = 'var(--bs-light)'; /*var(--bs-light);*/

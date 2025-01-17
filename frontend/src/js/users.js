@@ -130,6 +130,7 @@ function checkedRuoli(ut)       //passato ut['ruolo']
     resetRuoliPrimSec();
     // console.log('In checked ruoli ' + ut);
     // scompongo la stringa in un oggetto
+    console.log('ut ', ut)
     ut = parseRuoli(ut)
 
     // console.log(ut)

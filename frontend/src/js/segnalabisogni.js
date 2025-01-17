@@ -3,6 +3,7 @@ var apiBaseUrl = config.$api_url
 var myMdT;
 var td;
 var tr;
+var actualCrud;
 
 /** This file is part of e-Sedra.
  *
@@ -22,6 +23,111 @@ var tr;
  * @copyright Copyright 2023 e-Sedra. All Rights Reserved.
  *
  */
+function showBisogno(bis, crud) {
+    document.getElementById("hidden_post_id").value = bis['idBs'];
+    /*  console.log("valore di hidden ", bis['idBs']);*/
+    document.getElementById("titleBis").value = bis['titleBis'];
+    document.getElementById("textBis").value = bis['textBis'];
+    document.getElementById("topic_id").value = bis['ambito'];
+    if (bis['moreambito'] != "") {
+        document.getElementById("moreambito").value = bis['moreambito'];
+        if (document.getElementById("divmoreinfo").classList.contains('invisible')) {
+            //alert('ero invisibile');
+            document.getElementById("divmoreinfo").classList.remove('invisible');
+            //document.getElementById("divmoreinfo").classList.add('visible');
+            //alert('ora divento visibile perch� ce more');
+        }
+    }
+    else {
+        if (!document.getElementById("divmoreinfo").classList.contains('invisible')) {
+            //document.getElementById("divmoreinfo").classList.remove('visible');
+            document.getElementById("divmoreinfo").classList.add('invisible');
+        }
+    }
+    var ndr = document.getElementById("NdR");
+    if (ndr)
+        ndr.value = bis['rev'];
+    var pb = document.getElementById("publish");
+    if (pb) {
+        pb.checked = bis['pubblicato'];
+        toggleBtnPub();
+    }
+    var fsForm = document.getElementById("fsForm");
+    /*     var fsDatiPro = document.getElementById("fsDatiPro");*/
+    var fsRev = document.getElementById("fsRev");
+    let cp = document.getElementById("confirmBis");
+
+    if (crud == 'U') {
+        abilitaFS(fsForm, true);
+        vediPulsante(cp, true);
+        if (pb.disabled) pb.removeAttribute('disabled');
+        cp.value = "Conferma Dati";
+        settaTitleAccordion("btnAccBis", "Modifica Bisogno");
+    }
+    if (crud == 'D') {
+        abilitaFS(fsForm, false);
+        abilitaFS(fsRev, true);
+        pb.setAttribute('disabled', true);
+        cp.value = "Cancella";
+        vediPulsante(cp, true);
+        settaTitleAccordion("btnAccBis", "Cancella Bisogno");
+    }
+    if (crud == 'R') {
+        abilitaFS(fsForm, true);
+        abilitaFS(fsRev, true);
+        cp.value = "Conferma Dati";
+        vediPulsante(cp, true);
+        if (pb.disabled) pb.removeAttribute('disabled');
+        settaTitleAccordion("btnAccBis", "Revisiona Bisogno");
+    }
+    if (crud == 'V' || bis['deleted'] == 1) {
+        abilitaFS(fsForm, false);
+        abilitaFS(fsRev, false);
+        vediPulsante(cp, false);
+        settaTitleAccordion("btnAccBis", "Vedi Bisogno");
+    }
+
+    collapsableBis.show();
+    //var fieldsetBis = document.getElementById("fsForm");
+    //if (!mod || bis['deleted'] == 1) {
+    //    fieldsetBis.disabled = 'disabled';
+    //    //    if(revBis)
+    //    //        revBis.style.display = 'none';
+    //}
+    //else fieldsetBis.removeAttribute('disabled');
+}
+
+async function call_ajax_edit_bis(bis, crud) {
+    //console.log(bis);
+    setHidden(bis);
+    var pub = 0;
+    var data = new FormData;
+    data.append("idBis", bis);
+    data.append("pub", pub);  //ZERO PER TUTTI I BISOGNI PUBBLICATI E NON
+    let promo = fetch(apiBaseUrl + '/getsinglebisogno', {
+        method: 'POST',
+        body: data
+    }).then(successResponse => {
+        if (successResponse.status != 200) {
+            return null;
+        } else {
+            return successResponse.json();
+        }
+    },
+        failResponse => {
+            //console.log("promessa fallita view bisogni");
+            return null;
+        }
+    );
+    //console.log('aspetto che la promessa risolva');
+
+    let result = await promo;
+    if (result) {
+        //console.log(result);
+        showBisogno(result, crud);
+        //accord.show();
+    }
+}
 
 function creaContenutoCella(ele, riga) {
     var st = "";
@@ -322,7 +428,6 @@ ready(function () {
     var fortimer = document.getElementById("scadenza");
     var dataFine = fortimer.value;
     dataFine = dataFine.replace(" ", "T");
-    // console.log(dataFine);
     avviaContoAllaRovescia(dataFine, "demo");
 
 }); //end ready

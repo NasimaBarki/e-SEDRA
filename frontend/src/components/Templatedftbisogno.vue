@@ -100,7 +100,7 @@ export default {
     mounted() {
         if(this.hiddenPostId !=  null)
             hi = this.hiddenPostId
-        if(this.revisionsect != null || this.revisionsect != 1)
+        if(this.revisionsect == false)
             this.revisionsectClass = 'd-none'
         if(!this.confirmButton || this.confirmButton != 1)
             this.confirmButtonClass = 'd-none'
@@ -186,6 +186,7 @@ export default {
         }
     }
     var ndr = document.getElementById("NdR");
+    console.log(bis)
     if (ndr)
         ndr.value = bis['rev'];
     var pb = document.getElementById("publish");

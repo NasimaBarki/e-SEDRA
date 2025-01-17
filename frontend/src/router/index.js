@@ -9,6 +9,7 @@ import Logfile from '../views/Logfile.vue'
 import Generale from '../views/Generale.vue'
 import Attivita from '@/views/Attivita.vue'
 import BisogniBase from '@/views/BisogniBase.vue'
+import BisogniSinglePost from '@/components/BisogniSinglePost.vue'
 
 const routes = [
     {
@@ -55,7 +56,13 @@ const routes = [
         path: '/bisognibase',
         name: 'bisogni',
         component: BisogniBase
-    }
+    },
+    {
+        path: '/bisognisinglepost/:id',
+        name: 'bisogniSinglePost',
+        component: BisogniSinglePost,
+        props: true
+    },
 ]
 
 const router = createRouter({

@@ -72,10 +72,14 @@ export function loginScript(updateUserCallback) {
     }
 
     document.querySelectorAll('input').forEach(input => {
-        //console.log(input);
+        // Skip the input if it has a specific class
+        if (input.getAttribute('id') && input.getAttribute('id').includes('testoCommento')) {
+            return; // Skip this input
+        }
+
         input.addEventListener('keypress', function (e) {
             if (e.key == " ") {
-                alert("Lo spazio non � un carattere valido!");
+                alert("Lo spazio non è un carattere valido!");
                 e.preventDefault();
             }
         });

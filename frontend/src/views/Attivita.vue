@@ -4,10 +4,10 @@ import Stelle from '../components/Stelle.vue'
 </script>
 
 <template>
-
 <section class="container" id="activities">
     <h2 class="page-title mt-3">Configurazione attività</h2>
     <hr />
+
     <div class="row justify-content-evenly">
         <div class="col-md-4 mt-3">
             <div class="accordion" id="accordionAct">
@@ -324,16 +324,16 @@ export default {
         return {
             acti: undefined,
             ruoli: [],
-            roles: undefined,
+            roles: [],
             facti: {}
         }
     },
     async mounted() {
         import('../js/confactscript')
 
+        await this.getRuoli()
         await this.associaRuoliAttivita()
         this.selectPrimaryRoles()
-        this.getRuoli()
         // console.log(this.acti)
     },
     methods:
@@ -341,12 +341,33 @@ export default {
         async getRuoli() {
             let res = await axios.get(this.apiBaseUrl + '/getRuoliAll')
             this.roles = JSON.parse(res.data)
+            // console.log(this.roles)
+
             // console.log('ALL RUOLI:\n', this.roles)
         },
         async associaRuoliAttivita() {
             let res = await axios.get(this.apiBaseUrl + '/ruoliAttivita')
             //console.log(res.data)
             this.acti = res.data
+            // console.log('associaRuoli ', res.data)
+            for(let i in this.acti) {
+                // console.log('raut ', this.acti[i])
+                let res = await axios.post(this.apiBaseUrl + '/getRuolidiAttivita', {data: JSON.stringify({id: this.acti[i].idAt})})
+                let ruoli = res.data
+                let ruoloStringa = ''
+
+                // console.log(this.acti[i].idAt)
+
+                if(ruoli.length > 0)
+                    for(let i = 0; i < ruoli.length; i++) {
+                        for(let j = 0; j < Object.keys(this.roles).length; j++) {
+                            if(this.roles[j].idRl == ruoli[i].ruolo)
+                                ruoloStringa += this.roles[j].ruolo + ' '
+                        }
+                }
+
+                this.acti[i].raut = ruoloStringa.trim()
+            }
             this.associaBgAttivita()
         },
         async selectPrimaryRoles() {

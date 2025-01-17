@@ -179,7 +179,7 @@ function TogglePubblication(id, tab) {
     data = new FormData;
     data.append("id", id);
     data.append("table", tab);
-    fetch('ajax/togglepublication.php', {
+    fetch(apiBaseUrl + '/togglepublication', {
         method: 'POST',
         body: data
     }).then(
@@ -320,9 +320,14 @@ function refreshSinglePost(idb, dfpage, act, n = 0) {
     var data = new FormData;
     data.append("page", dfpage);
     //alert("id " + idb+ " defaultp "+dfpage+" act "+act);
+    // for (var pair of data.entries()) {
+    //     console.log(pair[0] + ', ' + pair[1]);
+    // }
     if (act == 104) {
         data.append("idBis", idb);
-        call_ajax_viewPage("pages/bisognisinglepost.php", data);
+
+        // window.location.href = 'http://localhost:5173/bisognisinglepost'
+        // call_ajax_viewPage("/bisognisinglepost", data);
         /*call_ajax_viewPage("pages/home.php", data);*/
     }
     else {
@@ -545,6 +550,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 function avviaContoAllaRovescia(dataFine, elementoId) {
     // Converte dataFine in un timestamp
+    // console.log(dataFine)
     var dataFineTimestamp = new Date(dataFine).getTime();
 
     // Aggiorna il conto alla rovescia ogni 1 secondo

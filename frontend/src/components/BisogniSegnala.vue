@@ -44,11 +44,12 @@ import Templatedftbisogno from './Templatedftbisogno.vue';
                     <tbody>
                         <template v-for="(post, index) in posts" :key="post.idBs">
                             <tr>
+                                
                                 <td>
                                     {{ index + 1 }}
                                 </td>
                                 <td>
-                                    <button type="button" class="linkstylebutton btn btn-outline-primary text-start" data-idbis="<?php echo  $post['idBs']; ?>" value="<?php echo  $post['idBs'];?>">
+                                    <button type="button" class="linkstylebutton btn btn-outline-primary text-start" v-bind:data-idbis="post['idBs']" value="<?php echo  $post['idBs'];?>">
                                         {{ post.titleBis }}
                                     </button>
                                 </td>
@@ -61,7 +62,6 @@ import Templatedftbisogno from './Templatedftbisogno.vue';
                             </tr>
                         </template>
                         <tr v-if="posts.length == 0">
-                                {{ posts }}
                                 <td colspan="3" class="alert alert-primary col-md-12 mt-3 text-center">Nessun bisogno da visualizzare</td>
                         </tr>
                     </tbody>

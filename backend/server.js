@@ -60,6 +60,10 @@ var spUpdValBisRouter = require('./routes/setup/0919spUpdValBis.js')
 var blogBRouter = require('./routes/setup/0012blogB.js')
 var segnalaBRouter = require('./routes/setup/0014segnalaB.js')
 var gradBisogniRouter = require('./routes/setup/0015gradBisogni.js')
+var proposteRouter = require('./routes/setup/0020proposte.js')
+var spReqTokenRouter = require('./routes/setup/0904spReqToken.js')
+var tokenRouter = require('./routes/setup/0005token.js')
+var spChgPswWithTokenRouter = require('./routes/setup/0905spChgPswWithToken.js')
 
 // crea app express
 const app = express()
@@ -127,6 +131,10 @@ app.use('/', spUpdValBisRouter)
 app.use('/', blogBRouter)
 app.use('/', segnalaBRouter)
 app.use('/', gradBisogniRouter)
+app.use('/', proposteRouter)
+app.use('/', spReqTokenRouter)
+app.use('/', tokenRouter)
+app.use('/', spChgPswWithTokenRouter)
 
 // attivazione server
 app.listen(config.port, () => {

@@ -10,6 +10,7 @@ import Generale from '../views/Generale.vue'
 import Attivita from '@/views/Attivita.vue'
 import BisogniBase from '@/views/BisogniBase.vue'
 import BisogniSinglePost from '@/components/BisogniSinglePost.vue'
+import ProposteBase from '@/views/ProposteBase.vue'
 
 const routes = [
     {
@@ -62,6 +63,11 @@ const routes = [
         name: 'bisogniSinglePost',
         component: BisogniSinglePost,
         props: true
+    },
+    {
+        path: '/propostebase',
+        name: 'proposte',
+        component: ProposteBase
     },
 ]
 

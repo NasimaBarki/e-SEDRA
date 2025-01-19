@@ -3,6 +3,7 @@ import BisogniDiscutaVota from '@/components/BisogniDiscutiVota.vue';
 import BisogniRevisione from '@/components/BisogniRevisione.vue';
 import BisogniSegnala from '@/components/BisogniSegnala.vue';
 import BisogniDiscuti from '@/components/BisogniDiscuti.vue';
+import BisogniDefault from '@/components/BisogniDefault.vue';
 </script>
 
 <template>
@@ -13,6 +14,13 @@ import BisogniDiscuti from '@/components/BisogniDiscuti.vue';
             <BisogniDiscutaVota v-if="((mom.idAt == 104 && !fasiID.includes(103)) || (mom.idAt == 103 && fasiID.includes(104))) && (VDbisogni.IamRev || VDbisogni.IamAuthor)" :VDbisogni = 'VDbisogni' :VDposts = 'VDposts' :user = 'user'/>
             <BisogniDiscuti v-if="mom.idAt == 103 && !fasiID.includes(104)" :Dbisogni="Dbisogni" :Dposts="Dposts"/>
         </template>
+        <BisogniDefault v-if="(conta == 0 || notable == true) && defaultPosts && topics" 
+        :posts="defaultPosts" 
+        :titlePage="'Nessuna fase attiva riguardante i bisogni, oppure il tuo ruolo non consente la partecipazione alla fase attiva'"
+        :h2 = "'I miei Bisogni'"
+        :conambito = "false"
+        :topics = 'topics'
+        />
     </template>
 </template>
 
@@ -41,15 +49,25 @@ export default {
             Pbisogni: {},
             field: '',
             gradDefBisogni: 0,
-            Pposts: []
+            Pposts: [],
+            defaultPosts: null
         }
     },
     mounted() {
         this.fetchTopics()
         this.fetchMoment()
+        this.getAllPosts()
     },
     methods:
     {
+        async getAllPosts() {
+            let obj = {}
+            obj.table = 'bisogni'
+            obj.role = 'personal'
+            obj.idUs = this.user.idUs
+            let res = await axios.post(this.apiBaseUrl + '/postsdatelimited', {data: JSON.stringify(obj)})
+            this.defaultPosts = res.data
+        },
         async fetchTopics() {
             let res = await axios.get(this.apiBaseUrl + '/ambiti')
             //console.log(res.data)

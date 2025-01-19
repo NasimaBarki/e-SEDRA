@@ -4,9 +4,9 @@
 const express = require('express')
 var sequelize = require('../sequelize')
 const bcrypt = require('bcrypt')
-var passport = require('passport')
-var LocalStrategy = require('passport-local')
 const roles = require('../js/utilfunctions')
+const formData = require('express-form-data')
+const nodemailer = require('nodemailer')
 
 // file di configurazione
 const configPath = './config.json'
@@ -18,6 +18,7 @@ let type = undefined
 
 // setup router
 const router = express.Router()
+router.use(formData.parse())
 
 router.post('/login', async (req, res) => {
     let body = req.body
@@ -151,6 +152,111 @@ router.post('/login', async (req, res) => {
         res.status(500).send({ 'R': 'X' })
     }
 })
+
+function genToken(length = 8) {
+    const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    const charsLength = chars.length;
+    let token = '';
+
+    // Generate a random token based on the chars string and the desired length
+    for (let i = 0; i < length; i++) {
+        const randomIndex = Math.floor(Math.random() * charsLength);  // Secure random index
+        token += chars[randomIndex];
+    }
+
+    return token;
+}
+
+// Function to send the token via email (using nodemailer)
+async function sendTokenMail(token, email) {
+    const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: config.database.mailAdmin,
+            pass: config.database.passwordAdmin,
+        },
+    });
+
+    const mailOptions = {
+        from: config.database.mailAdmin,
+        to: email,
+        subject: 'Your Token',
+        text: `Here is your token: ${token}`,
+    };
+
+    try {
+        await transporter.sendMail(mailOptions);
+        return true;
+    } catch (error) {
+        console.error('Error sending email:', error);
+        return false;
+    }
+}
+
+router.post('/chktoken', async (req, res) => {
+    const { TOKEN, NEWPSW } = req.body;
+
+    if (!TOKEN || !NEWPSW) {
+        return res.status(400).json({ error: 'Token and New Password are required' });
+    }
+
+    try {
+        // Hash the new password
+        const hashedPassword = await bcrypt.hash(NEWPSW, 10);
+
+        // Call stored procedure to change the password
+        const sql = 'CALL chgPswWithToken(:token, :newPsw)';
+        const [result] = await sequelize.query(sql, {
+            replacements: { token: TOKEN, newPsw: hashedPassword },
+            type: sequelize.QueryTypes.SELECT
+        });
+
+        if (result && result.length > 0) {
+            return res.json({ message: 'Password changed successfully' });
+        } else {
+            return res.status(400).json({ error: 'Error executing password change procedure' });
+        }
+    } catch (error) {
+        console.error('Error changing password:', error);
+        return res.status(500).json({ error: 'Internal Server Error' });
+    }
+})
+
+// Define the '/chkreqtoken' route
+router.post('/chkreqtoken', async (req, res) => {
+    const { EMAIL } = req.body;
+
+    if (!EMAIL) {
+        return res.status(400).json({ error: 'Email is required' });
+    }
+
+    // SQL query to call the stored procedure (adapt for Sequelize or raw query)
+    const token = genToken();
+    const exp = 0; // You can modify this value based on your requirements (was previously `$_SESSION['ini']['scTkn']`)
+
+    try {
+        const result = await sequelize.query('CALL reqToken(:usn, :token, :exp)', {
+            replacements: { usn: EMAIL, token, exp },
+            type: sequelize.QueryTypes.SELECT,
+        });
+
+        if (result && result.length > 0) {
+            // Sending token email
+            const emailSent = await sendTokenMail(token, EMAIL);
+
+            if (emailSent) {
+                res.json({ token: 'Token sent successfully' });
+            } else {
+                res.status(500).json({ error: 'Error sending token email' });
+            }
+        } else {
+            res.status(400).json({ error: 'Error executing procedure' });
+        }
+    } catch (error) {
+        console.error('Error executing procedure or sending email:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
 
 router.post('/chkloglogin', async (req, res) => {
     let user = req.body

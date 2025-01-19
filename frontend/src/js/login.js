@@ -112,10 +112,10 @@ export function loginScript(updateUserCallback) {
                         url = '/login';
                         break;
                     case 'register-form':
-                        url = 'ajax/chktoken.php';
+                        url = '/chktoken';
                         break;
                     case 'token-form':
-                        url = 'ajax/chkreqtoken.php';
+                        url = '/chkreqtoken';
                         break;
                     case 'expPsw-form':
                         url = 'ajax/chkchgexppsw.php';

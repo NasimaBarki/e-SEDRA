@@ -23,6 +23,8 @@ router.get('/config', (req, res) => {
     options.scTkn = config.scTkn
     options.emailNoRep = config.emailNoRep
     options.delLog = config.delLog
+    options.BallottaggioBis = config.BallottaggioBis
+    options.gradDefBisogni = config.gradDefBisogni
 
     res.json(JSON.stringify(options))
 })

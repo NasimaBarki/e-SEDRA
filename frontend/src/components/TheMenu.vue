@@ -31,7 +31,9 @@ import Login from './Login.vue'
                     <router-link to='/bisognibase' text-decoration-none>Bisogni</router-link>
                 </li>
                 <li>
-                    <a class="<?php if($mact == 2) echo 'active'; ?> text-decoration-none" href="pages/propostebase.php" id="2">Proposte</a>
+                    <router-link to='/propostebase' text-decoration-none>Proposte</router-link>
+
+                    <!-- <a class="<?php if($mact == 2) echo 'active'; ?> text-decoration-none" href="pages/propostebase.php" id="2">Proposte</a> -->
                 </li>
                 <!-- TODO: <?php
                 if(array_key_exists(1, $_SESSION['user']['roles'])) { //utente è amministratore

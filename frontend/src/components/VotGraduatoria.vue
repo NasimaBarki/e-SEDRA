@@ -12,13 +12,15 @@
 <div class="card-body">
     <!-- {{ chkVal }} -->
     <table id="tableSt" class="table table-responsive mb-3" name="tableStelle">
-        <tr>
+        <tbody>
+            <tr>
             <th><small>Stelle</small></th>
             <th><small>N</small></th>
             <th><small>di</small></th>
             <th><small>Max</small></th>
-        </tr>
-        <template v-for="i = 1 in 10">
+            </tr>
+
+            <template v-for="i = 1 in 10">
             <tr v-bind:id="'r' + i" v-bind:class="getRowClass(i)">
             
             <td>
@@ -36,6 +38,7 @@
             </td>
         </tr>
         </template>
+        </tbody>
     </table>
 </div>
 <div class="card-footer">      

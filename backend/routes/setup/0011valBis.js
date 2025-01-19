@@ -388,6 +388,31 @@ router.post('/getLastPollType', async (req, res) => {
     }
 })
 
+router.post('/getSummaryBis', async (req, res) => {
+    const { field } = JSON.parse(req.body.data); // Extract the field from the request body
+
+    // SQL query to get the idBs and titleBis for Bisogni that match the field and aren't deleted
+    const sql = `
+        SELECT idBs, titleBis 
+        FROM bisogni 
+        WHERE ${field} = 1 
+        AND deleted <> 1
+        AND dtIns >= (SELECT dtStart FROM attivita WHERE idAt = 101)
+        AND dtIns <= (SELECT dtStop FROM attivita WHERE idAt = 101)
+    `;
+
+    try {
+        // Execute the SQL query using Sequelize
+        const [results] = await sequelize.query(sql);
+
+        // Send the results back to the client
+        res.json(results);
+    } catch (error) {
+        console.error('Error fetching summary of Bisogni:', error);
+        res.status(500).json({ error: 'Error fetching summary of Bisogni' });
+    }
+});
+
 // router.post('/getBisResultPolling', async (req, res) => {
 //     const { role, savegrad, field, user_id } = JSON.parse(req.body.data); // Extracting the POST data
 

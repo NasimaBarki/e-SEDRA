@@ -59,6 +59,7 @@ var spGetNrVotiRouter = require('./routes/setup/0937spGetNrVoti.js')
 var spUpdValBisRouter = require('./routes/setup/0919spUpdValBis.js')
 var blogBRouter = require('./routes/setup/0012blogB.js')
 var segnalaBRouter = require('./routes/setup/0014segnalaB.js')
+var gradBisogniRouter = require('./routes/setup/0015gradBisogni.js')
 
 // crea app express
 const app = express()
@@ -125,6 +126,7 @@ app.use('/', spGetNrVotiRouter)
 app.use('/', spUpdValBisRouter)
 app.use('/', blogBRouter)
 app.use('/', segnalaBRouter)
+app.use('/', gradBisogniRouter)
 
 // attivazione server
 app.listen(config.port, () => {

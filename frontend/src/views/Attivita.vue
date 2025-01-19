@@ -199,8 +199,9 @@ import Stelle from '../components/Stelle.vue'
                                             <td v-bind:id="'To' + ac['idAt']">
                                                <input type="hidden" v-bind:id="'hTo' + ac['idAt']" v-bind:name="'hTo' + ac['idAt']" v-bind:value="ac['dtStop']" />
                                                <template v-if="ac.dtStop && ac.dtStop != ''">
-                                                    {{ new Date(ac.dtStop).toLocaleString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false }).replace(',', '') }}
-                                                </template>
+                                                {{ new Date(ac.dtStop).toLocaleString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false }).replace(',', '') }}
+                                                
+                                            </template>
                                             </td>
 
                                             <td v-bind:id="'rev' + ac['idAt']">
@@ -347,7 +348,7 @@ export default {
         },
         async associaRuoliAttivita() {
             let res = await axios.get(this.apiBaseUrl + '/ruoliAttivita')
-            //console.log(res.data)
+            console.log(res.data)
             this.acti = res.data
             // console.log('associaRuoli ', res.data)
             for(let i in this.acti) {

@@ -114,11 +114,11 @@ router.get('/getMoment', async (req, res) => {
                 }
             }
 
-            res.json(results)
+            if (n == 0)
+                res.json({ 'error': 'Non ci sono attività attive in questo momento.' })
+            else
+                res.json(results)
         }
-
-        if (n == 0)
-            res.json({ 'error': 'Non ci sono attività attive in questo momento.' })
     } catch (error) {
         console.log(error)
         res.sendStatus(500).send('Errore query getMoment')

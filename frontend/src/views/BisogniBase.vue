@@ -2,6 +2,7 @@
 import BisogniDiscutaVota from '@/components/BisogniDiscutiVota.vue';
 import BisogniRevisione from '@/components/BisogniRevisione.vue';
 import BisogniSegnala from '@/components/BisogniSegnala.vue';
+import BisogniDiscuti from '@/components/BisogniDiscuti.vue';
 </script>
 
 <template>
@@ -10,6 +11,7 @@ import BisogniSegnala from '@/components/BisogniSegnala.vue';
             <BisogniSegnala v-if="mom.idAt == 101 && Abisogni.IamAuthor" :Abisogni = 'Abisogni' :posts = 'posts' :topics = 'topics' :user = 'user'/>
             <BisogniRevisione v-if="mom.idAt == 102 && Rbisogni.IamRev" :Rbisogni = 'Rbisogni' :Rposts = 'Rposts' :topics = 'topics' :user = 'user'/>
             <BisogniDiscutaVota v-if="((mom.idAt == 104 && !fasiID.includes(103)) || (mom.idAt == 103 && fasiID.includes(104))) && (VDbisogni.IamRev || VDbisogni.IamAuthor)" :VDbisogni = 'VDbisogni' :VDposts = 'VDposts' :user = 'user'/>
+            <BisogniDiscuti v-if="mom.idAt == 103 && !fasiID.includes(104)" :Dbisogni="Dbisogni" :Dposts="Dposts"/>
         </template>
     </template>
 </template>
@@ -34,7 +36,12 @@ export default {
             VDbisogni: {},
             fasiID: [],
             VDposts: [],
-            Dbisogni: {}
+            Dbisogni: {},
+            Dposts: [],
+            Pbisogni: {},
+            field: '',
+            gradDefBisogni: 0,
+            Pposts: []
         }
     },
     mounted() {
@@ -179,6 +186,18 @@ export default {
                     this.Dbisogni.IamAuthor = this.compareRuoli(this.Dbisogni.author, this.user.roles)
                     this.Dbisogni.IamRev = this.IamRevisor(this.Dbisogni.revisore, this.user.roles)
 
+                    if(this.Dbisogni.IamAuthor || this.Dbisogni.IamRev) {
+                        let obj = {}
+                        obj.anonym = true
+                        obj.field = field
+                        obj.userId = this.user.idUs
+
+                        let res = await axios.post(this.apiBaseUrl + '/getAllPublishBisWithoutGrade', {data: JSON.stringify(obj)})
+                        this.Dposts = res.data
+                    }
+                    else {
+                        notable = true
+                    }
                 }
                 if(this.moment[i].idAt == 104 && !this.fasiID.includes(103)) {
                     this.VDbisogni = this.moment[i]
@@ -210,6 +229,44 @@ export default {
                     }
                     else {
                         notable = true
+                    }
+                }
+                if(this.moment[i].idAt == 105) {
+                    this.Pbisogni = this.moment[i]
+                    this.Pbisogni.pubBis = true
+                    this.Pbisogni.IamRev = this.IamRevisor(this.Pbisogni.revisore, this.user.roles)
+                    this.Pbisogni.IamAuthor = false
+
+                    let obj = {}
+                    obj.idAt = 104
+
+                    let res = await axios.post(this.apiBaseUrl + '/getLastPollType', {data: JSON.stringify(obj)})
+                    let ballot = res.data
+
+                    if(ballot != null) {
+                        if(ballot.ballottaggio == 0) {
+                            let field = 'pubblicato'
+                            this.field = field
+                            if(this.Pbisogni.IamRev) {
+                                if(this.gradDefBisogni == 0) {
+                                    obj = {}
+                                    obj.role = 'revisore'
+                                    obj.savegrad = 1
+                                    obj.field = field
+                                    obj.user_id = this.user.idUs
+                                    let res = await axios.post(this.apiBaseUrl + '/getBisResultPolling', {data: JSON.stringify(obj)})
+                                    this.Pposts = res.data
+                                }
+                                if(this.gradDefBisogni == 1) {
+                                    obj.check = 1
+                                    obj.news = 1
+                                }
+                                else if(this.gradDefBisogni == 2) {
+                                    obj.check = 0
+                                    obj.news = 0
+                                }
+                            }
+                        }
                     }
                 }
             }

@@ -1,3 +1,7 @@
+<script setup>
+import BisogniFilteredPosts from './BisogniFilteredPosts.vue';
+</script>
+
 <template>
 <section class="container mt-3" id="singlepostb">
     <h2 >
@@ -74,11 +78,8 @@
             </div>
             <div id="infoMessagge" class="my-callout d-none"></div>
             <!--sposto qui gli altri bisogni nello stesso ambito-->
-
-                </div> <div class='col-sm-6 mb-3'>
-                
-
-
+                    </div> <div class='col-sm-6 mb-3'>
+                    <BisogniFilteredPosts v-if="ambitoName && ambito && idB && field" :ambitoName="ambitoName" :ambito="ambito" :idB="idB" :field="field"/>
         </div>
 
         <template v-if="comments">
@@ -136,7 +137,7 @@
                                                     <label for="testoRisposta<?php echo $cmn['idBl'];?>" class="form-label">Risposta</label>
                                                 </div>
                                                 <div class="form-floating col-2 text-md-end">
-                                                    <input type="submit" id="rispostaCommento<?php echo $cmn['idBl'];?>" data-idpadre="<?php echo $cmn['bisogno'];?>" class="btn btn-primary btn-sm mb-3 publicBtn" name="rispostaCommento" value="Pubblica" />
+                                                    <input type="submit" v-bind:id="'rispostaCommento' + cmn['idBl']" v-bind:data-idpadre="cmn['bisogno']" class="btn btn-primary btn-sm mb-3 publicBtn" name="rispostaCommento" value="Pubblica" />
                                                 </div>
                                             </div>
                                         </form>
@@ -145,29 +146,32 @@
                             </div>
 
                             <div class="container">
+                                <!-- {{ cmn.answ }} -->
                                 <template v-for="risp in cmn.answ">
 
-                                <div :class="'card w-100 h-100 ' + segnComRiabi(risp)" id="Risposta<?php echo $risp['idBl'];?>">
+                                <div :class="'card w-100 h-100 ' + segnComRiabi(risp)" v-bind:id="'Risposta' + risp['idBl']">
                                     <div class="card-header">
                                         <h6 class="card-subtitle ">
                                             {{ risp.anome }} {{ risp.acognome }}
                                             <span class="text-muted text-start small">
                                                 &nbsp;&nbsp;
+                                                {{ new Date(risp.dtIns).toLocaleString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false }).replace(',', '') }}
                                                 
                                             </span>
                                         </h6>
 
                                     </div>
-                                    <div :class="'row card-body ', cmn.nobutton ? 'my-blog' : ''" id="bodycard<?php echo $risp['idBl'];?>">
+                                    <div :class="'row card-body ', cmn.nobutton ? 'my-blog' : ''" v-bind:id="'bodycard' + risp['idBl']">
 
-                                        <div class="col-sm-2 <?php if($risp['nobutton'] || $riabiR) echo ' d-none';?>">
-                                            <input type="checkbox" class="btn-check signalBtn" data-bs-toggle="tooltip" title="Segnala" id="btnSegnala<?php echo $risp['idBl'];?>" autocomplete="off" />
-                                            <label class="btn btn-outline-primary" for="btnSegnala<?php echo $risp['idBl'];?>">
-                                                <span class='bi bi-hand-thumbs-down-fill'></span><span class='bi bi-hand-thumbs-down'></span><!--bi bi-hand-thumbs-down-->
+                                        <div v-bind:class="'col-sm-2 ' + risp.nobutton || risp.stato == 2 ? 'd-none' : ''">
+                                            <input type="checkbox" class="btn-check signalBtn" data-bs-toggle="tooltip" title="Segnala" v-bind:id="'btnSegnala' + risp['idBl']" autocomplete="off" />
+                                            <label class="btn btn-outline-primary" v-bind:for="'btnSegnala' + risp['idBl']">
+                                                <span v-if="risp.stato == 1" class='bi bi-hand-thumbs-down-fill'></span>
+                                                <span v-else class='bi bi-hand-thumbs-down'></span>
                                             </label>
                                         </div>
                                         <div class="col-sm-10 justify-content-start">
-                                            
+                                            {{ risp.content }}
                                         </div>
 
                                     </div>
@@ -204,16 +208,13 @@ export default {
             comments: null,
             contComm: 0,
             answers: {},
-            totalCom: 0
+            totalCom: 0,
+            ambitoName: null,
+            ambito: null,
+            idB: null
         }
     },
     mounted() {
-//         var old = alert;
-
-// alert = function() {
-//   console.log(new Error().stack);
-//   old.apply(window, arguments);
-// };
 document.onreadystatechange = () => {
         if (document.readyState == "complete") {
             import('../js/singlepostB')
@@ -253,6 +254,10 @@ document.onreadystatechange = () => {
             let res = await axios.post(this.apiBaseUrl + '/getOnePublishBisWithGrade', {data: JSON.stringify(obj)})
             this.post = res.data
 
+            this.ambitoName = this.post.ambitoName,
+            this.ambito = this.post.ambito,
+            this.idB = this.post.idBs
+
             delete obj.field
             delete obj.anonim
             obj.idUs = obj.userId
@@ -289,6 +294,17 @@ document.onreadystatechange = () => {
                     else 
                         this.comments[cm].nobutton = false
                     this.comments[cm].answ = []
+                    for(let asn in this.answers) {
+                        // console.log(this.answers[asn])
+                        if(this.answers[asn].idMaster == this.comments[cm].idBl) {
+                            if(this.answers[asn].autore == JSON.parse(localStorage.getItem('user')).idUs)
+                                this.answers[asn].nobutton = true
+                            else
+                                this.answers[asn].nobutton = false
+                            this.comments[cm].answ.push(this.answers[asn])
+                            // console.log(cm)
+                        }
+                    }
                 }
             }
         }

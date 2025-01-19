@@ -41,6 +41,7 @@ function goPersonalPost(itable) {
 
 function call_ajax_set_comment(formNome, risp, master, elemb, itable) {
     var formd = document.getElementById(formNome);
+    console.log('formd ', formd)
     var data = new FormData(formd);
     //l'id del bisogno viene recuperato dal campo nascosto idOrigin nel form'
     /* alert("target dentro funz" + elemb);*/
@@ -51,6 +52,8 @@ function call_ajax_set_comment(formNome, risp, master, elemb, itable) {
     data.append('itable', itable);
     data.append("us", window.currentUser?.idUs)
     stampaFormData(data);
+    console.log('a')
+
     fetch(apiBaseUrl + '/setcomment', {
         method: 'POST',
         body: data
@@ -63,6 +66,7 @@ function call_ajax_set_comment(formNome, risp, master, elemb, itable) {
             }
             // Examine the text in the response
             response.text().then(function (risp) {
+                console.log('testo')
                 //trasformo ilJSON in oggetto JS
                 var bis = JSON.parse(risp);
                 /* alert("set_comment bis " + bis + " elemb " + elemb);*/
@@ -369,11 +373,14 @@ ready(function () {
     if (btnpub) {
         for (let i = 0; i < btnpub.length; i++)
             btnpub[i].addEventListener("click", function (e) {
+                console.log('btn ', btnpub)
+
                 e.preventDefault();
                 var id = this.getAttribute("id");
                 /* alert("clic su pubblica risposta");*/
                 var nome = "rispostaCommento";
                 var idBl = id.substr(nome.length, id.length);
+                console.log('risposta')
                 call_ajax_set_comment("formRisposta" + idBl, 1, idBl, e.target.dataset.idbis, 'B');
             });
     }

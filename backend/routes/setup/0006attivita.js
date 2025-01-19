@@ -194,7 +194,12 @@ router.post('/updateactivity', async (req, res) => {
     let sqls = ''
     let sql = ''
     let riga = null
+    let idnex
+    let errore = 0
 
+    // console.log('dtstop ', dtStop)
+    // if (dtStop)
+    //     console.log('new date', new Date(dtStop).toLocaleString("it-IT", { timeZone: "Europe/Rome" }))
     if (Array.isArray(idAt))
         idAt = idAt[0]
 
@@ -212,6 +217,7 @@ router.post('/updateactivity', async (req, res) => {
             dtStart = new Date(dtStart)
             let datestart = dtStart.toISOString().slice(0, 19).replace('T', ' ')
 
+            // console.log('datestart ', datestart)
             sqla += ' dtStart = \'' + datestart + '\','
             if (idprec != 0)
                 sqlb += ' dtStart = \'' + datestart + '\','
@@ -220,6 +226,8 @@ router.post('/updateactivity', async (req, res) => {
             dtStop = new Date(dtStop)
             let datestop = dtStop.toISOString().slice(0, 19).replace('T', ' ')
 
+            // console.log('dtStop ', dtStop)
+            // console.log('datestop ', dtStop.replace('T', ' ') + ':00')
             sqla += ' dtStop = \'' + datestop + '\','
             if (idprec != 0)
                 sqlb += ' dtStop = \'' + datestop + '\','
@@ -264,7 +272,7 @@ router.post('/updateactivity', async (req, res) => {
         if (revisore) {
             sqla += ' revisore = ' + revisore + ','
             if (ida == 101 || ida == 201) {
-                let idnex = ida + 1
+                idnex = ida + 1
                 sqlc += ' revisore = ' + revisore + ','
             }
             if (idprec != 0)
@@ -318,17 +326,18 @@ router.post('/updateactivity', async (req, res) => {
 
                 if (results.length > 0) {
                     // There is an overlapping activity
-                    return res.json({ success: false, message: 'Sovrapposizione trovata.' });
+                    res.json({ success: false, message: 'Sovrapposizione trovata.' });
                 } else {
                     // No overlap
-                    return res.json({ success: true });
+                    res.json({ success: true });
                 }
             } catch (error) {
+                errore = 1
                 console.error(error);
                 return res.status(500).send('Errore nella verifica delle attività contemporanee');
             }
         }
-        else {
+        else if (errore == 0) {
             if (select) {
                 sql = "SELECT attivita.*,ruoli.ruolo as rev FROM attivita left join ruoli on ruoli.idRl=attivita.revisore WHERE idAt=" + ida + ";"
             }

@@ -294,4 +294,297 @@ router.post('/getAllPublishBisWithGrade', async (req, res) => {
     }
 });
 
+router.post('/getAllPublishBisWithoutGrade', async (req, res) => {
+    const { anonym, field, userId } = JSON.parse(req.body.data);  // Get anonym, field, and userId from request body
+
+    let sql = ''; // SQL query placeholder
+
+    // Check if anonym is false (similar to $anonim in PHP)
+    if (!anonym) {
+        // SQL query when anonym is false
+        sql = `
+            SELECT t.*, idmi AS nlike
+            FROM (
+                SELECT b.*, a.ambito AS ambitonome, a.valenza, u.nome, u.cognome
+                FROM bisogni AS b
+                JOIN utenti AS u ON b.utente = u.idUs
+                JOIN ambiti AS a ON b.ambito = a.idAm
+                WHERE b.dtIns >= (SELECT dtStart FROM attivita WHERE idAt = 101)
+                AND b.dtIns <= (SELECT dtStop FROM attivita WHERE idAt = 101)
+                AND b.${field} = 1
+                AND b.deleted <> 1
+            ) AS t
+            LEFT JOIN miPiaceB ON t.idBs = miPiaceB.bisogno AND miPiaceB.utente = ${userId}
+        `;
+    } else {
+        // SQL query when anonym is true
+        sql = `
+            SELECT t.*, idmi AS nlike
+            FROM (
+                SELECT b.*, a.ambito AS ambitonome, a.valenza
+                FROM bisogni AS b
+                JOIN ambiti AS a ON b.ambito = a.idAm
+                WHERE b.dtIns >= (SELECT dtStart FROM attivita WHERE idAt = 101)
+                AND b.dtIns <= (SELECT dtStop FROM attivita WHERE idAt = 101)
+                AND b.${field} = 1
+                AND b.deleted <> 1
+            ) AS t
+            LEFT JOIN miPiaceB ON t.idBs = miPiaceB.bisogno AND miPiaceB.utente = ${userId}
+        `;
+    }
+
+    // Add date range condition for the "valBis" table
+    const dateRange = `
+        AND miPiaceB.dtIns BETWEEN (SELECT dtStart FROM attivita WHERE idAt = 103)
+        AND (SELECT dtStop FROM attivita WHERE idAt = 103)
+        ORDER BY t.ambito, t.idBs;
+    `;
+
+    try {
+        // Execute the SQL query using Sequelize
+        const [results] = await sequelize.query(sql + dateRange);
+
+        // Send the results back to the client
+        res.json(results);
+    } catch (error) {
+        console.error('Error fetching posts without grade:', error);
+        res.status(500).json({ error: 'Error fetching posts without grade' });
+    }
+});
+
+router.post('/getLastPollType', async (req, res) => {
+    const { idAt } = JSON.parse(req.body.data)  // Extract idAt from the request parameters
+
+    // SQL query to get the ballottaggio for the given idAt where stato is 2
+    const sql = `
+        SELECT ballottaggio 
+        FROM attivita 
+        WHERE idAt = :idAt 
+        AND stato = 2
+    `
+
+    try {
+        // Execute the SQL query
+        const [result, metadata] = await sequelize.query(sql, {
+            replacements: { idAt },
+            type: sequelize.QueryTypes.SELECT
+        })
+
+        for (const [key, value] of Object.entries(result)) {
+            if (JSON.stringify(value).includes('Buffer')) {
+                let num = JSON.stringify(value).slice(-3, JSON.stringify(value).length - 2)
+                result[key] = parseInt(num)
+            }
+        }
+        console.log(result)
+        // Check if any result was returned
+        if (result)
+            res.json(result)
+        else
+            res.json(null)
+    } catch (error) {
+        console.error('Error fetching last poll type:', error)
+        res.status(500).json({ error: 'Internal Server Error' })
+    }
+})
+
+// router.post('/getBisResultPolling', async (req, res) => {
+//     const { role, savegrad, field, user_id } = JSON.parse(req.body.data); // Extracting the POST data
+
+//     // SQL query to get the necessary data
+//     let sql = `
+//         SELECT
+//             bisogni.idBs, ambiti.idAm, ambiti.ambito, bisogni.titleBis, bisogni.utente, 
+//             bisogni.pubblicato, bisogni.dtRev, bisogni.rev, bisogni.deleted, 
+//             bisogni.ingrad, vvll.*
+//         FROM
+//             bisogni, ambiti,
+//             (SELECT biv, grade, votanti, nlike
+//              FROM (SELECT bisogni.idBs as biv, sum(grade) as grade, count(grade) as votanti
+//                    FROM bisogni
+//                    LEFT JOIN valBis ON
+//                        bisogni.idBs = valBis.bisogno
+//                        AND valBis.dtIns >= (SELECT dtStart FROM attivita WHERE idAt=104)
+//                        AND valBis.dtIns <= (SELECT dtStop FROM attivita WHERE idAt=104)
+//                    GROUP BY bisogni.idBs) AS vv
+//              LEFT JOIN
+//                (SELECT bisogni.idBs as bil, count(idmi) as nlike
+//                 FROM (bisogni
+//                   LEFT JOIN miPiaceB ON
+//                   bisogni.idBs = miPiaceB.bisogno
+//                   AND miPiaceB.dtIns >= (SELECT dtStart FROM attivita WHERE idAt=104)
+//                   AND miPiaceB.dtIns <= (SELECT dtStop FROM attivita WHERE idAt=104))
+//                 GROUP BY bisogni.idBs) AS ll
+//              ON vv.biv = ll.bil) AS vvll
+//         WHERE
+//             bisogni.idBs = vvll.biv
+//             AND ambiti.idAm = bisogni.ambito
+//     `;
+
+//     // Modify SQL based on user role
+//     if (role === "personal") {
+//         sql += ` AND utente = :user_id ORDER BY grade DESC;`;
+//     } else {
+//         sql += ` ORDER BY grade DESC, nlike DESC, ambito ASC;`;
+//     }
+
+//     try {
+//         // Execute the SQL query with Sequelize
+//         const [posts, metadata] = await sequelize.query(sql, {
+//             replacements: { user_id },
+//             type: sequelize.QueryTypes.RAW
+//         });
+
+//         if (savegrad) {
+//             const gradposts = [];
+
+//             console.log(posts)
+//             posts.forEach(post => {
+//                 if (!post.deleted && post[field]) {
+//                     post.ingrad = 1;
+//                     gradposts.push(post);
+//                 }
+//             });
+
+//             let bal = 0;
+//             if (field === "ingrad") {
+//                 bal = 1;
+//             }
+
+//             // Prepare the SQL for saving the grad list
+//             let gradSql = `DELETE FROM gradBisogni WHERE ballot = :bal; INSERT INTO gradBisogni (idBs, IdAm, grade, nlike, votanti, ballot) VALUES `;
+//             const coll = [];
+
+//             gradposts.forEach(post => {
+//                 const grade = post.grade || 0;
+//                 gradSql += `(:idBs, :idAm, :grade, :nlike, :votanti, :bal),`;
+//                 coll.push(post.idBs);
+//             });
+
+//             gradSql = gradSql.slice(0, -1); // Remove last comma
+//             gradSql += `; UPDATE bisogni SET ingrad = 1 WHERE idBs IN (${coll.join(',')})`;
+
+//             console.log()
+//             // Execute the grad update SQL
+//             await sequelize.query(gradSql, {
+//                 replacements: {
+//                     bal,
+//                     ...gradposts.reduce((acc, post, index) => {
+//                         acc[`idBs_${index}`] = post.idBs;
+//                         acc[`idAm_${index}`] = post.idAm;
+//                         acc[`grade_${index}`] = post.grade || 0;
+//                         acc[`nlike_${index}`] = post.nlike;
+//                         acc[`votanti_${index}`] = post.votanti;
+//                         return acc;
+//                     }, {}),
+//                 },
+//                 type: sequelize.QueryTypes.INSERT
+//             });
+
+//             req.session.ini.gradDefBisogni = 1;
+
+//             // Assuming updIniFile is a function that updates session values
+//             // updIniFile('Temp', 'gradDefBisogni', 1);
+
+//             if (field === "ingrad") {
+//                 req.session.ini.BallottaggioBis = 1;
+//                 // updIniFile('Temp', 'BallottaggioBis', 1);
+//             }
+//         }
+
+//         res.json(posts); // Send the posts back as a JSON response
+//     } catch (error) {
+//         console.error('Error in /getBisResultPolling route:', error);
+//         res.status(500).json({ error: 'Internal Server Error' });
+//     }
+// });
+
+router.post('/getBisResultPolling', async (req, res) => {
+    // Extract the required data from the POST body
+    const { role, savegrad, field, user_id } = JSON.parse(req.body.data); // Extract role, savegrad, and field from the request
+
+    // SQL query base
+    let sql = `
+        SELECT
+            bisogni.idBs, ambiti.idAm, ambiti.ambito, bisogni.titleBis, bisogni.utente, 
+            bisogni.pubblicato, bisogni.dtRev, bisogni.rev, bisogni.deleted, 
+            bisogni.ingrad, vvll.*
+        FROM
+            bisogni, ambiti,
+            (SELECT biv, grade, votanti, nlike
+             FROM (SELECT bisogni.idBs as biv, sum(grade) as grade, count(grade) as votanti
+                   FROM bisogni
+                   LEFT JOIN valBis ON
+                       bisogni.idBs = valBis.bisogno
+                       AND valBis.dtIns >= (SELECT dtStart FROM attivita WHERE idAt=104)
+                       AND valBis.dtIns <= (SELECT dtStop FROM attivita WHERE idAt=104)
+                   GROUP BY bisogni.idBs) AS vv
+             LEFT JOIN
+               (SELECT bisogni.idBs as bil, count(idmi) as nlike
+                FROM (bisogni
+                  LEFT JOIN miPiaceB ON
+                  bisogni.idBs = miPiaceB.bisogno
+                  AND miPiaceB.dtIns >= (SELECT dtStart FROM attivita WHERE idAt=104)
+                  AND miPiaceB.dtIns <= (SELECT dtStop FROM attivita WHERE idAt=104))
+                GROUP BY bisogni.idBs) AS ll
+             ON vv.biv = ll.bil) AS vvll
+        WHERE
+            bisogni.idBs = vvll.biv
+            AND ambiti.idAm = bisogni.ambito
+    `;
+
+    // Modify the SQL query based on role
+    if (role === "personal") {
+        sql += ` AND utente = ${user_id} ORDER BY grade DESC;`;
+    } else {
+        sql += ` ORDER BY grade DESC, nlike DESC, ambito ASC;`;
+    }
+
+    try {
+        // Execute the initial SQL query
+        const [posts, metadata] = await sequelize.query(sql, {
+            type: sequelize.QueryTypes.RAW
+        });
+
+        if (savegrad) {
+            const gradposts = [];
+            console.log(posts)
+            posts.forEach(post => {
+                if (!post.deleted && post[field]) {
+                    post.ingrad = 1;
+                    gradposts.push(post);
+                }
+            });
+
+            let bal = 0;
+            if (field === "ingrad") {
+                bal = 1;
+            }
+
+            // Construct the DELETE and INSERT query for gradBisogni
+            let gradSql = `DELETE FROM gradBisogni WHERE ballot = ${bal}; INSERT INTO gradBisogni (idBs, IdAm, grade, nlike, votanti, ballot) VALUES `;
+            let coll = "(";
+            gradposts.forEach(post => {
+                const grade = post.grade || 0; // Ensure grade is not null
+                gradSql += `(${post.idBs}, ${post.idAm}, ${grade}, ${post.nlike}, ${post.votanti}, ${bal}),`;
+                coll += `${post.idBs},`;
+            });
+
+            // Remove the trailing comma and complete the SQL
+            gradSql = gradSql.slice(0, -1) + ";";
+            coll = coll.slice(0, -1) + ")";
+            gradSql += ` UPDATE bisogni SET ingrad = 1 WHERE idBs IN ${coll};`;
+
+            // Execute the grad update SQL
+            await sequelize.query(gradSql, { type: sequelize.QueryTypes.INSERT });
+        }
+
+        // Return the result as JSON
+        res.json(posts);
+    } catch (error) {
+        console.error('Error in /your-endpoint route:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
 module.exports = router

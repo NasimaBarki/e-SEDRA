@@ -530,10 +530,10 @@ async function call_ajax_edit_act(act) {
     data.append("select", "1");
     data.append("idAt", act);
     //console.log(act + '  ' + data);
-    console.log('DATA')
-    for (var pair of data.entries()) {
-        console.log(pair[0] + ', ' + pair[1]);
-    }
+    // console.log('DATA')
+    // for (var pair of data.entries()) {
+    //     console.log(pair[0] + ', ' + pair[1]);
+    // }
 
     let tuttepromesse = [];
     let promo1 = fetch(apiBaseUrl + '/updateactivity', {

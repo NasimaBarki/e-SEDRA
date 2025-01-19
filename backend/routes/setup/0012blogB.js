@@ -65,6 +65,25 @@ router.post('/blogB', async (req, res) => {
     }
 })
 
+router.post('/getPublishedPostsByTopic', async (req, res) => {
+    const { am_id, field } = JSON.parse(req.body.data);  // Extract the topic and field from the request body
+
+    // Create the query based on the provided parameters
+    let sql = `SELECT *  FROM bisogni as b where b.ambito=${am_id} AND b.${field}=1 AND b.deleted <> 1
+    `;
+    const period = ` AND dtIns >= (SELECT dtStart FROM attivita WHERE idAt=101) AND dtIns <= (SELECT dtStop FROM attivita WHERE idAt=101);`
+    sql += period
+
+    try {
+        const [results, metadata] = await sequelize.query(sql)
+        console.log(results)
+        res.json(results)
+    } catch (error) {
+        console.error('Error executing the query:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
 router.post('/setComment', async (req, res) => {
     const {
         idOrigin, // The ID of the original post or item
